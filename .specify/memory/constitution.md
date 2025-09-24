@@ -1,16 +1,14 @@
 <!--
 Sync Impact Report - Constitution Update
-Version: 1.0.0 → 1.0.1
-Modified Principles: None
-Added Sections: Version Control Standards (minor addition)
+Version: 1.0.1 → 1.0.2
+Modified Principles: V. TypeScript Everywhere (added kebab-case filename requirement)
+Added Sections: None
 Removed Sections: None
 Templates Requiring Updates:
-- ✅ plan-template.md (constitution check gates align)
-- ✅ spec-template.md (functional requirements align with DDD)
-- ✅ tasks-template.md (task categorization supports event sourcing patterns)
-- ✅ agent-file-template.md (structure supports serverless architecture)
-- ✅ CLAUDE.md (version control standards documented)
-Follow-up TODOs: None - all standards aligned
+- ✅ plan-template.md (TypeScript compliance check updated)
+- ✅ tasks-template.md (filename convention tasks aligned)
+- ✅ CLAUDE.md (TypeScript standards updated with kebab-case requirement)
+Follow-up TODOs: None - kebab-case requirement properly integrated
 -->
 
 # FinDash Constitution
@@ -30,7 +28,7 @@ Domain aggregates MUST persist state as an immutable sequence of domain events. 
 Backend services MUST use AWS managed services over self-managed infrastructure. Lambda functions MUST be stateless and follow single-responsibility principle. DynamoDB MUST be used for event storage with proper partition key design. API Gateway MUST handle HTTP routing and request validation.
 
 ### V. TypeScript Everywhere
-All backend code MUST be written in TypeScript with strict type checking enabled. Domain models MUST have comprehensive type definitions. API contracts MUST be generated from TypeScript interfaces. No `any` types allowed in production code without explicit justification.
+All backend code MUST be written in TypeScript with strict type checking enabled. Domain models MUST have comprehensive type definitions. API contracts MUST be generated from TypeScript interfaces. No `any` types allowed in production code without explicit justification. All TypeScript filenames MUST use kebab-case naming convention (e.g., `user-aggregate.ts`, `payment-handler.ts`, `invoice-service.ts`).
 
 ## Architecture Standards
 
@@ -63,4 +61,4 @@ This constitution supersedes all other development practices and architectural d
 
 Code reviews MUST verify adherence to DDD principles and event sourcing patterns. Performance requirements MUST align with serverless constraints and cold start considerations. Complexity MUST be justified when deviating from standard AWS serverless patterns.
 
-**Version**: 1.0.1 | **Ratified**: 2025-09-24 | **Last Amended**: 2025-09-24
+**Version**: 1.0.2 | **Ratified**: 2025-09-24 | **Last Amended**: 2025-09-24

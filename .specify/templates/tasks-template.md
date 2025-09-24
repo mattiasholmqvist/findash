@@ -55,13 +55,13 @@
 - [ ] T007 [P] Integration test auth flow in tests/integration/test_auth.py
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T008 [P] Domain aggregate in src/domain/user_aggregate.ts
-- [ ] T009 [P] Domain events in events/user_events.ts
-- [ ] T010 [P] Command handlers in src/application/user_commands.ts
-- [ ] T011 [P] Query handlers in src/application/user_queries.ts
-- [ ] T012 [P] Event store repository in src/infrastructure/user_repository.ts
-- [ ] T013 POST /api/users Lambda handler in src/handlers/create_user.ts
-- [ ] T014 GET /api/users/{id} Lambda handler in src/handlers/get_user.ts
+- [ ] T008 [P] Domain aggregate in src/domain/user-aggregate.ts
+- [ ] T009 [P] Domain events in events/user-events.ts
+- [ ] T010 [P] Command handlers in src/application/user-commands.ts
+- [ ] T011 [P] Query handlers in src/application/user-queries.ts
+- [ ] T012 [P] Event store repository in src/infrastructure/user-repository.ts
+- [ ] T013 POST /api/users Lambda handler in src/handlers/create-user.ts
+- [ ] T014 GET /api/users/{id} Lambda handler in src/handlers/get-user.ts
 - [ ] T015 Input validation with TypeScript schemas
 - [ ] T016 Error handling and structured logging
 
@@ -73,8 +73,8 @@
 - [ ] T021 CloudWatch logging and monitoring setup
 
 ## Phase 3.5: Polish
-- [ ] T022 [P] Unit tests for domain aggregates in tests/unit/test_aggregates.ts
-- [ ] T023 [P] Event sourcing replay tests in tests/integration/test_replay.ts
+- [ ] T022 [P] Unit tests for domain aggregates in tests/unit/test-aggregates.ts
+- [ ] T023 [P] Event sourcing replay tests in tests/integration/test-replay.ts
 - [ ] T024 Performance tests for Lambda cold starts (<1000ms)
 - [ ] T025 [P] Update OpenAPI documentation
 - [ ] T026 Remove code duplication and optimize bundle size

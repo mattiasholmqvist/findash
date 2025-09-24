@@ -76,6 +76,7 @@
 - [ ] No `any` types without justification
 - [ ] Domain models have comprehensive types
 - [ ] API contracts use TypeScript interfaces
+- [ ] Filenames use kebab-case convention
 
 ## Project Structure
 
@@ -243,4 +244,4 @@ ios/ or android/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v1.0.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.0.2 - See `/memory/constitution.md`*

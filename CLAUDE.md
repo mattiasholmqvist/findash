@@ -15,7 +15,7 @@ This project follows strict architectural principles defined in `.specify/memory
 - **CQRS Architecture**: Commands and queries are separated with distinct data representations
 - **Event Sourcing**: Domain aggregates persist as immutable event sequences; current state derived by replay
 - **AWS Serverless-First**: Backend uses Lambda functions, DynamoDB, EventBridge, API Gateway
-- **TypeScript Everywhere**: Strict typing required throughout, no `any` types without justification
+- **TypeScript Everywhere**: Strict typing required throughout, no `any` types without justification, kebab-case filenames mandatory
 
 ### Project Structure Conventions
 - **Hexagonal Architecture**: Clear separation of domain, application, and infrastructure layers
