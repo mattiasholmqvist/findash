@@ -47,7 +47,35 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Domain-Driven Design Compliance
+- [ ] Feature starts with domain model identification
+- [ ] Ubiquitous language used in requirements
+- [ ] Bounded context boundaries clearly defined
+- [ ] Business logic contained in domain aggregates
+
+### CQRS Architecture Compliance
+- [ ] Commands and queries clearly separated
+- [ ] Write operations modify state through aggregates
+- [ ] Read operations use optimized projections
+- [ ] No business logic in query handlers
+
+### Event Sourcing Compliance
+- [ ] Domain events identified for state changes
+- [ ] Events capture business intent, not just data
+- [ ] Event schemas are versioned
+- [ ] Aggregate reconstruction from events planned
+
+### AWS Serverless Compliance
+- [ ] Lambda functions follow single responsibility
+- [ ] DynamoDB partition key strategy defined
+- [ ] Stateless function design verified
+- [ ] Managed services prioritized over custom infrastructure
+
+### TypeScript Compliance
+- [ ] All interfaces and types defined
+- [ ] No `any` types without justification
+- [ ] Domain models have comprehensive types
+- [ ] API contracts use TypeScript interfaces
 
 ## Project Structure
 
@@ -79,16 +107,22 @@ tests/
 # Option 2: Web application (when "frontend" + "backend" detected)
 backend/
 ├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
+│   ├── domain/           # Domain aggregates and entities
+│   ├── application/      # Command/Query handlers
+│   ├── infrastructure/   # AWS service implementations
+│   └── handlers/         # Lambda entry points
+├── events/              # Event schemas and definitions
 └── tests/
+    ├── unit/
+    ├── integration/
+    └── contract/
 
 frontend/
 ├── src/
 │   ├── components/
 │   ├── pages/
-│   └── services/
+│   ├── services/        # API clients and state management
+│   └── types/           # TypeScript definitions
 └── tests/
 
 # Option 3: Mobile + API (when "iOS/Android" detected)
@@ -209,4 +243,4 @@ ios/ or android/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.0.1 - See `/memory/constitution.md`*

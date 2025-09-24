@@ -55,32 +55,37 @@
 - [ ] T007 [P] Integration test auth flow in tests/integration/test_auth.py
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T008 [P] User model in src/models/user.py
-- [ ] T009 [P] UserService CRUD in src/services/user_service.py
-- [ ] T010 [P] CLI --create-user in src/cli/user_commands.py
-- [ ] T011 POST /api/users endpoint
-- [ ] T012 GET /api/users/{id} endpoint
-- [ ] T013 Input validation
-- [ ] T014 Error handling and logging
+- [ ] T008 [P] Domain aggregate in src/domain/user_aggregate.ts
+- [ ] T009 [P] Domain events in events/user_events.ts
+- [ ] T010 [P] Command handlers in src/application/user_commands.ts
+- [ ] T011 [P] Query handlers in src/application/user_queries.ts
+- [ ] T012 [P] Event store repository in src/infrastructure/user_repository.ts
+- [ ] T013 POST /api/users Lambda handler in src/handlers/create_user.ts
+- [ ] T014 GET /api/users/{id} Lambda handler in src/handlers/get_user.ts
+- [ ] T015 Input validation with TypeScript schemas
+- [ ] T016 Error handling and structured logging
 
 ## Phase 3.4: Integration
-- [ ] T015 Connect UserService to DB
-- [ ] T016 Auth middleware
-- [ ] T017 Request/response logging
-- [ ] T018 CORS and security headers
+- [ ] T017 DynamoDB event store setup with CDK
+- [ ] T018 EventBridge configuration for event publishing
+- [ ] T019 API Gateway integration with Lambda functions
+- [ ] T020 Cognito authentication integration
+- [ ] T021 CloudWatch logging and monitoring setup
 
 ## Phase 3.5: Polish
-- [ ] T019 [P] Unit tests for validation in tests/unit/test_validation.py
-- [ ] T020 Performance tests (<200ms)
-- [ ] T021 [P] Update docs/api.md
-- [ ] T022 Remove duplication
-- [ ] T023 Run manual-testing.md
+- [ ] T022 [P] Unit tests for domain aggregates in tests/unit/test_aggregates.ts
+- [ ] T023 [P] Event sourcing replay tests in tests/integration/test_replay.ts
+- [ ] T024 Performance tests for Lambda cold starts (<1000ms)
+- [ ] T025 [P] Update OpenAPI documentation
+- [ ] T026 Remove code duplication and optimize bundle size
+- [ ] T027 Run end-to-end testing scenarios
 
 ## Dependencies
-- Tests (T004-T007) before implementation (T008-T014)
-- T008 blocks T009, T015
-- T016 blocks T018
-- Implementation before polish (T019-T023)
+- Tests (T004-T007) before implementation (T008-T016)
+- T008 (aggregates) blocks T010, T012 (command/query handlers)
+- T009 (events) blocks T012 (event store repository)
+- T017-T021 (infrastructure) before polish (T022-T027)
+- Event store (T017) blocks handler integration (T019)
 
 ## Parallel Example
 ```
@@ -100,27 +105,39 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 ## Task Generation Rules
 *Applied during main() execution*
 
-1. **From Contracts**:
-   - Each contract file → contract test task [P]
-   - Each endpoint → implementation task
-   
-2. **From Data Model**:
-   - Each entity → model creation task [P]
-   - Relationships → service layer tasks
-   
-3. **From User Stories**:
-   - Each story → integration test [P]
-   - Quickstart scenarios → validation tasks
+1. **From Domain Model**:
+   - Each aggregate → domain aggregate task [P]
+   - Domain events → event schema task [P]
+   - Commands → command handler task [P]
+   - Queries → query handler task [P]
 
-4. **Ordering**:
-   - Setup → Tests → Models → Services → Endpoints → Polish
-   - Dependencies block parallel execution
+2. **From Contracts**:
+   - Each contract file → contract test task [P]
+   - Each endpoint → Lambda handler task
+
+3. **From Event Sourcing**:
+   - Event store → repository implementation task
+   - Event replay → integration test task [P]
+   - Event schemas → validation task [P]
+
+4. **From User Stories**:
+   - Each story → integration test [P]
+   - Quickstart scenarios → end-to-end test tasks
+
+5. **Ordering**:
+   - Setup → Tests → Domain → Application → Infrastructure → Handlers → Polish
+   - Event sourcing dependencies: Aggregates → Events → Handlers → Store
 
 ## Validation Checklist
 *GATE: Checked by main() before returning*
 
-- [ ] All contracts have corresponding tests
-- [ ] All entities have model tasks
+- [ ] All domain aggregates have corresponding tests
+- [ ] All domain events have schema validation tasks
+- [ ] All command handlers have unit tests
+- [ ] All query handlers have contract tests
+- [ ] Event sourcing replay tests are included
+- [ ] Lambda handlers have integration tests
+- [ ] Infrastructure tasks include CDK deployment
 - [ ] All tests come before implementation
 - [ ] Parallel tasks truly independent
 - [ ] Each task specifies exact file path
