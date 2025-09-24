@@ -29,14 +29,13 @@ if (import.meta.hot) {
 if (import.meta.env.MODE === 'development') {
   // Enable React DevTools profiler in development
   if (typeof window !== 'undefined') {
-    (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__?.onCommitFiberRoot = (
-      id: number,
-      root: any,
-      priorityLevel: number
-    ) => {
-      // Log slow renders
-      if (priorityLevel > 97) {
-        console.warn('Slow render detected', { id, priorityLevel })
+    const hook = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__
+    if (hook) {
+      hook.onCommitFiberRoot = (id: number, root: any, priorityLevel: number) => {
+        // Log slow renders
+        if (priorityLevel > 97) {
+          console.warn('Slow render detected', { id, priorityLevel })
+        }
       }
     }
   }

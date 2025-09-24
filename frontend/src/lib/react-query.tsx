@@ -3,9 +3,9 @@
  * Constitutional compliance: TypeScript strict typing, kebab-case filename
  */
 
+import React, { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ReactNode } from 'react'
 
 // Query client configuration
 const queryClientConfig = {
@@ -102,7 +102,6 @@ export const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
         <ReactQueryDevtools
           initialIsOpen={false}
           position="bottom-right"
-          buttonPosition="bottom-right"
         />
       )}
     </QueryClientProvider>

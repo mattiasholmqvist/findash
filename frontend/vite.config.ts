@@ -25,7 +25,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           query: ['@tanstack/react-query'],
           router: ['react-router-dom'],
-          virtual: ['react-virtual'],
+          window: ['react-window', 'react-window-infinite-loader'],
         },
       },
     },
@@ -34,6 +34,12 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    // Security headers in production should be set by the server/reverse proxy
+    // Examples for production:
+    // X-Frame-Options: DENY
+    // X-XSS-Protection: 1; mode=block
+    // X-Content-Type-Options: nosniff
+    // Content-Security-Policy: default-src 'self'
   },
   preview: {
     port: 3000,
