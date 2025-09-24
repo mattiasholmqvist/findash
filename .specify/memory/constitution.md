@@ -1,50 +1,66 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report - Constitution Update
+Version: 1.0.0 → 1.0.1
+Modified Principles: None
+Added Sections: Version Control Standards (minor addition)
+Removed Sections: None
+Templates Requiring Updates:
+- ✅ plan-template.md (constitution check gates align)
+- ✅ spec-template.md (functional requirements align with DDD)
+- ✅ tasks-template.md (task categorization supports event sourcing patterns)
+- ✅ agent-file-template.md (structure supports serverless architecture)
+- ✅ CLAUDE.md (version control standards documented)
+Follow-up TODOs: None - all standards aligned
+-->
+
+# FinDash Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Domain-Driven Design (NON-NEGOTIABLE)
+All system design MUST start with the business domain model. Ubiquitous language MUST be used throughout code, documentation, and communication. Domain models MUST be the source of truth for business logic and rules. Boundaries between bounded contexts MUST be explicit and well-defined.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. CQRS Architecture
+Command and Query operations MUST be separated at the service layer. Write models (commands) and read models (queries) MUST have distinct data representations optimized for their specific use cases. Commands MUST modify state through domain aggregates only. Queries MUST access optimized read models without side effects.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Event Sourcing Implementation
+Domain aggregates MUST persist state as an immutable sequence of domain events. Current state MUST be derived by replaying events from the event store. All business operations MUST emit domain events that capture business intent, not just data changes. Event schemas MUST be versioned and backward-compatible.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. AWS Serverless-First
+Backend services MUST use AWS managed services over self-managed infrastructure. Lambda functions MUST be stateless and follow single-responsibility principle. DynamoDB MUST be used for event storage with proper partition key design. API Gateway MUST handle HTTP routing and request validation.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. TypeScript Everywhere
+All backend code MUST be written in TypeScript with strict type checking enabled. Domain models MUST have comprehensive type definitions. API contracts MUST be generated from TypeScript interfaces. No `any` types allowed in production code without explicit justification.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Architecture Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Backend Architecture
+All backend services MUST follow the hexagonal architecture pattern with clear separation of domain, application, and infrastructure layers. AWS Lambda functions MUST implement command or query handlers only. Event processing MUST be asynchronous using SQS/EventBridge. Database access MUST go through repository abstractions.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Frontend Standards
+React applications MUST use functional components with TypeScript interfaces. State management MUST use React Query for server state and React Context for local state. Component libraries MUST provide consistent UX patterns. Vite MUST be used for build tooling with proper code splitting.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Testing Requirements
+Vitest MUST be used for all frontend testing with component, integration, and unit test levels. Backend Lambda functions MUST have unit tests with mocked AWS services. Event sourcing replay tests MUST validate aggregate reconstruction. End-to-end tests MUST cover critical user journeys.
+
+## Development Workflow
+
+### Code Quality Gates
+All code MUST pass TypeScript compilation with zero errors. ESLint rules MUST be configured for consistent code style. Automated tests MUST achieve 80% code coverage minimum. Domain events MUST have schema validation tests.
+
+### Deployment Standards
+Infrastructure MUST be defined as code using AWS CDK with TypeScript. Each bounded context MUST have independent deployment pipelines. Event schema changes MUST be deployed with backward compatibility validation. Frontend deployments MUST include performance budgets.
+
+### Event Schema Management
+All domain events MUST have versioned schemas stored in a schema registry. Event evolution MUST follow additive-only patterns. Event upcasting MUST be implemented for schema migrations. Event replay compatibility MUST be verified across versions.
+
+### Version Control Standards
+Feature branches MUST use numbered naming convention (`###-feature-name`). Commits MUST follow semantic commit structure with domain-specific types: `domain:`, `event:`, `infra:`, `cqrs:`. Commit scopes MUST reference bounded contexts, technical layers, or components. All commits MUST maintain constitutional compliance verification for affected principles.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices and architectural decisions. All feature specifications and implementation plans MUST verify compliance with these principles before proceeding. Violations MUST be documented with explicit justification and approved through architectural review.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Code reviews MUST verify adherence to DDD principles and event sourcing patterns. Performance requirements MUST align with serverless constraints and cold start considerations. Complexity MUST be justified when deviating from standard AWS serverless patterns.
+
+**Version**: 1.0.1 | **Ratified**: 2025-09-24 | **Last Amended**: 2025-09-24
