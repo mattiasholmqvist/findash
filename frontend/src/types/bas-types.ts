@@ -111,3 +111,8 @@ export const getBASClassForAccountNumber = (accountNumber: string): BASClass | n
 
   return null
 }
+
+// Get the Swedish name for a BAS class
+export const getBASClassName = (basClass: BASClass): string => {
+  return BAS_CLASS_INFO[basClass]?.swedishName || 'Okänd klass'
+}

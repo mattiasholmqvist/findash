@@ -4,7 +4,7 @@
  */
 
 import { createContext, useContext, useReducer, useEffect, ReactNode, Dispatch } from 'react'
-import { User, LoginRequest, LoginResponse, LogoutResponse, UserSession, AuthState, isSessionValid, getSessionTimeRemaining } from '@/types/user-types'
+import { User, LoginRequest, LoginResponse, LogoutResponse, UserSession, AuthState, isSessionValid, getSessionTimeRemaining, getUserPermissions } from '@/types/user-types'
 import { ApiResponse } from '@/types/api-types'
 import { mockAuthService } from '@/services/mock-auth-service'
 
@@ -417,8 +417,6 @@ export const useUserPermissions = () => {
   const hasPermission = (permission: string): boolean => {
     if (!user) return false
 
-    // Import getUserPermissions here to avoid circular dependency
-    const { getUserPermissions } = require('@/types/user-types')
     const permissions = getUserPermissions(user.role)
     return permissions.includes(permission)
   }

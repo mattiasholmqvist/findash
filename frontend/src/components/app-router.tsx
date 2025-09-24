@@ -5,6 +5,7 @@
 
 import { useState, useEffect, ReactNode } from 'react'
 import { useAuth } from '@/contexts/auth-context'
+import { getUserPermissions } from '@/types/user-types'
 import { LoginPage } from '@/pages/login-page'
 import { TransactionViewerPage } from '@/pages/transaction-viewer-page'
 import { ErrorPage, NotFoundPage, UnauthorizedPage } from '@/pages/error-page'
@@ -169,8 +170,6 @@ export const AppRouter = () => {
       return false
     }
 
-    // Import getUserPermissions here to avoid circular dependency
-    const { getUserPermissions } = require('@/types/user-types')
     const userPermissions = getUserPermissions(user.role)
 
     return permissions.every(permission => userPermissions.includes(permission))
