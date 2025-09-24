@@ -146,14 +146,29 @@ const isValidSwedishDate = (dateStr: string): boolean => {
   return date <= today && date.getFullYear() > 1900
 }
 
-export const formatSwedishCurrency = (amountInOre: number): string => {
+export const formatSwedishCurrency = (amountInOre: number, options?: {
+  compact?: boolean
+  accounting?: boolean
+}): string => {
   const amount = amountInOre / 100 // Convert öre to kronor
-  return new Intl.NumberFormat('sv-SE', {
+
+  const formatOptions: Intl.NumberFormatOptions = {
     style: 'currency',
     currency: 'SEK',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(amount)
+  }
+
+  if (options?.compact) {
+    formatOptions.notation = 'compact'
+    formatOptions.compactDisplay = 'short'
+  }
+
+  if (options?.accounting) {
+    formatOptions.currencySign = 'accounting'
+  }
+
+  return new Intl.NumberFormat('sv-SE', formatOptions).format(amount)
 }
 
 export const formatSwedishDate = (dateStr: string): string => {
