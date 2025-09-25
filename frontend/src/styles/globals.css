@@ -1446,3 +1446,168 @@ body {
 .dark .filter-toggle--expanded .active-filter-count {
   @apply text-blue-300 bg-blue-800/40;
 }
+
+/* Transaction List Component Styles */
+.transaction-list-container {
+  @apply w-full border border-gray-200 rounded-lg overflow-hidden bg-white;
+}
+
+.dark .transaction-list-container {
+  @apply border-slate-700 bg-slate-800;
+}
+
+.transaction-list-header {
+  @apply bg-gray-50 border-b border-gray-200 px-6 py-3;
+}
+
+.dark .transaction-list-header {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.transaction-header-grid {
+  @apply grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wide;
+}
+
+.dark .transaction-header-grid {
+  @apply text-gray-400;
+}
+
+.transaction-row {
+  @apply border-b border-gray-100 hover:bg-gray-50 transition-colors;
+}
+
+.dark .transaction-row {
+  @apply border-slate-700 hover:bg-slate-700;
+}
+
+.transaction-row--selected {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.dark .transaction-row--selected {
+  @apply bg-blue-900/20 border-blue-700;
+}
+
+.transaction-row--clickable {
+  @apply cursor-pointer;
+}
+
+.transaction-row--loading {
+  @apply animate-pulse;
+}
+
+.transaction-content {
+  @apply px-6 py-4;
+}
+
+.transaction-main {
+  @apply flex items-center justify-between space-x-4;
+}
+
+.transaction-date {
+  @apply text-xs font-mono text-gray-500 flex-shrink-0 w-20;
+}
+
+.dark .transaction-date {
+  @apply text-gray-400;
+}
+
+.transaction-description {
+  @apply flex-1 min-w-0;
+}
+
+.transaction-description-primary {
+  @apply text-sm font-medium text-gray-900 truncate;
+}
+
+.dark .transaction-description-primary {
+  @apply text-white;
+}
+
+.transaction-reference {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .transaction-reference {
+  @apply text-gray-400;
+}
+
+.transaction-amount {
+  @apply text-right flex-shrink-0 w-24;
+}
+
+.amount-value {
+  @apply block text-sm font-mono font-medium;
+}
+
+.amount-type {
+  @apply block text-xs text-gray-500 uppercase;
+}
+
+.dark .amount-type {
+  @apply text-gray-400;
+}
+
+.transaction-amount--debit .amount-value {
+  @apply text-red-600;
+}
+
+.dark .transaction-amount--debit .amount-value {
+  @apply text-red-400;
+}
+
+.transaction-amount--credit .amount-value {
+  @apply text-green-600;
+}
+
+.dark .transaction-amount--credit .amount-value {
+  @apply text-green-400;
+}
+
+.transaction-secondary {
+  @apply flex items-center justify-between mt-2 text-xs text-gray-500;
+}
+
+.dark .transaction-secondary {
+  @apply text-gray-400;
+}
+
+.transaction-account {
+  @apply font-mono;
+}
+
+.transaction-class {
+  @apply text-gray-400;
+}
+
+.dark .transaction-class {
+  @apply text-gray-500;
+}
+
+.transaction-loading {
+  @apply px-6 py-4 space-y-2;
+}
+
+.loading-skeleton {
+  @apply bg-gray-200 rounded animate-pulse;
+}
+
+.dark .loading-skeleton {
+  @apply bg-slate-700;
+}
+
+.loading-skeleton--date {
+  @apply h-3 w-16;
+}
+
+.loading-skeleton--description {
+  @apply h-4 w-48;
+}
+
+.loading-skeleton--amount {
+  @apply h-4 w-20 ml-auto;
+}
+
+.loading-skeleton--account {
+  @apply h-3 w-24;
+}
