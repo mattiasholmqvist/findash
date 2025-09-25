@@ -25,11 +25,15 @@ describe('Integration: User Authentication Flow', () => {
     const loginButton = screen.getByRole('button', { name: 'Logga in' })
 
     // Fill in valid credentials
-    await user.type(usernameInput, 'demo.user')
-    await user.type(passwordInput, 'demo123')
+    await act(async () => {
+      await user.type(usernameInput, 'demo.user')
+      await user.type(passwordInput, 'demo123')
+    })
 
     // Submit form
-    await user.click(loginButton)
+    await act(async () => {
+      await user.click(loginButton)
+    })
 
     // Check that login callback was called with user data
     await waitFor(() => {
@@ -57,13 +61,18 @@ describe('Integration: User Authentication Flow', () => {
     const loginButton = screen.getByRole('button', { name: 'Logga in' })
 
     // Fill in invalid credentials
-    await user.type(usernameInput, 'wronguser')
-    await user.type(passwordInput, 'wrongpass')
-    await user.click(loginButton)
+    await act(async () => {
+      await user.type(usernameInput, 'wronguser')
+      await user.type(passwordInput, 'wrongpass')
+    })
+
+    await act(async () => {
+      await user.click(loginButton)
+    })
 
     // Should display Swedish error message
     await waitFor(() => {
-      expect(screen.getByText('Ogiltiga inloggningsuppgifter')).toBeInTheDocument()
+      expect(screen.getByText('Felaktigt användarnamn eller lösenord')).toBeInTheDocument()
     })
   })
 
@@ -82,15 +91,27 @@ describe('Integration: User Authentication Flow', () => {
       expect(screen.queryByText('Kontrollerar inloggningsstatus...')).not.toBeInTheDocument()
     }, { timeout: 3000 })
 
+    const usernameInput = screen.getByLabelText('Användarnamn')
+    const passwordInput = screen.getByLabelText('Lösenord')
     const loginButton = screen.getByRole('button', { name: 'Logga in' })
 
-    // Submit without filling fields
-    await user.click(loginButton)
+    // Initially button should be disabled with empty fields
+    expect(loginButton).toBeDisabled()
 
-    // Should show validation errors in Swedish
+    // Type values that meet length requirements but fail validation
+    await act(async () => {
+      await user.type(usernameInput, 'x!@') // 3 chars but contains invalid characters
+      await user.type(passwordInput, '123456') // 6 chars, meets length requirement
+    })
+
+    // Submit with invalid but non-empty fields
+    await act(async () => {
+      await user.click(loginButton)
+    })
+
+    // Should show validation errors in Swedish for invalid characters
     await waitFor(() => {
-      expect(screen.getByText('Användarnamn krävs')).toBeInTheDocument()
-      expect(screen.getByText('Lösenord krävs')).toBeInTheDocument()
+      expect(screen.getByText('Användarnamn får endast innehålla bokstäver, siffror, punkt och underscore')).toBeInTheDocument()
     })
   })
 
@@ -114,9 +135,14 @@ describe('Integration: User Authentication Flow', () => {
     const passwordInput = screen.getByLabelText('Lösenord')
     const loginButton = screen.getByRole('button', { name: 'Logga in' })
 
-    await user.type(usernameInput, 'demo.user')
-    await user.type(passwordInput, 'demo123')
-    await user.click(loginButton)
+    await act(async () => {
+      await user.type(usernameInput, 'demo.user')
+      await user.type(passwordInput, 'demo123')
+    })
+
+    await act(async () => {
+      await user.click(loginButton)
+    })
 
     // Check that login was successful
     await waitFor(() => {
