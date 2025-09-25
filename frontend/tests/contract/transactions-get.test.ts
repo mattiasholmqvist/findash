@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 describe('Contract: GET /transactions', () => {
   it('should return paginated transaction list with default parameters', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const response = await mockTransactionService.getTransactions({})
 
@@ -17,7 +17,7 @@ describe('Contract: GET /transactions', () => {
   })
 
   it('should support pagination parameters', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const response = await mockTransactionService.getTransactions({
       page: 1,
@@ -30,7 +30,7 @@ describe('Contract: GET /transactions', () => {
   })
 
   it('should support date filtering', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const dateFrom = new Date('2024-01-01')
     const dateTo = new Date('2024-12-31')
@@ -49,7 +49,7 @@ describe('Contract: GET /transactions', () => {
   })
 
   it('should support BAS class filtering', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const response = await mockTransactionService.getTransactions({
       basClass: 4 // Revenue class
@@ -61,7 +61,7 @@ describe('Contract: GET /transactions', () => {
   })
 
   it('should support search filtering', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const response = await mockTransactionService.getTransactions({
       search: 'invoice'

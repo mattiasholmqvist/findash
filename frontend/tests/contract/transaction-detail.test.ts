@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 describe('Contract: GET /transactions/{id}', () => {
   it('should return transaction details for valid ID', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     // First get a list to find a valid ID
     const listResponse = await mockTransactionService.getTransactions({})
@@ -27,7 +27,7 @@ describe('Contract: GET /transactions/{id}', () => {
   })
 
   it('should throw 404 error for non-existent transaction ID', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const nonExistentId = '00000000-0000-0000-0000-000000000000'
 
@@ -36,7 +36,7 @@ describe('Contract: GET /transactions/{id}', () => {
   })
 
   it('should validate UUID format for transaction ID', async () => {
-    const mockTransactionService = await import('@/services/mock-transaction-service')
+    const mockTransactionService = await import('@/services/mock-transaction-api-service')
 
     const invalidId = 'not-a-uuid'
 
