@@ -1,0 +1,167 @@
+name: CI Orchestrator
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      infrastructure: ${{ steps.filter.outputs.infrastructure }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - 'package.json'
+              - 'package-lock.json'
+            backend:
+              - 'backend/**'
+              - 'package.json'
+              - 'package-lock.json'
+            infrastructure:
+              - 'infrastructure/**'
+              - 'package.json'
+              - 'package-lock.json'
+            workflows:
+              - '.github/workflows/**'
+
+  trigger-frontend-ci:
+    name: Trigger Frontend CI
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/ci-frontend.yml
+    secrets: inherit
+
+  trigger-backend-ci:
+    name: Trigger Backend CI
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/ci-backend.yml
+    secrets: inherit
+
+  trigger-infrastructure-ci:
+    name: Trigger Infrastructure CI
+    needs: detect-changes
+    if: needs.detect-changes.outputs.infrastructure == 'true'
+    uses: ./.github/workflows/ci-infrastructure.yml
+    secrets: inherit
+
+  constitutional-compliance:
+    name: Constitutional Compliance Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check TypeScript strict mode
+        run: |
+          echo "Checking for any types in TypeScript files..."
+          if grep -r "any" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.next .; then
+            echo "Warning: Found 'any' types in TypeScript files. These should be justified or removed."
+          fi
+
+      - name: Validate file naming conventions
+        run: |
+          echo "Checking for kebab-case file naming..."
+          find . -name "*.ts" -o -name "*.tsx" | grep -v node_modules | grep -v dist | while read file; do
+            filename=$(basename "$file")
+            if [[ ! "$filename" =~ ^[a-z0-9-]+\.(ts|tsx)$ ]] && [[ "$filename" != "*.test.ts" ]] && [[ "$filename" != "*.spec.ts" ]]; then
+              echo "Warning: File $file does not follow kebab-case naming convention"
+            fi
+          done
+
+      - name: Check domain model structure
+        run: |
+          echo "Verifying domain-driven design structure..."
+          if [ ! -d "backend/src/domain" ]; then
+            echo "Warning: Domain directory not found. Ensure DDD principles are followed."
+          fi
+          if [ ! -d "backend/src/application" ]; then
+            echo "Warning: Application directory not found. Ensure hexagonal architecture is followed."
+          fi
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  all-checks-complete:
+    name: All CI Checks Complete
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - trigger-frontend-ci
+      - trigger-backend-ci
+      - trigger-infrastructure-ci
+      - constitutional-compliance
+      - security-scan
+    if: always()
+
+    steps:
+      - name: Check CI Status
+        run: |
+          echo "CI Pipeline Status Summary:"
+          echo "=========================="
+
+          if [[ "${{ needs.detect-changes.outputs.frontend }}" == "true" ]]; then
+            echo "Frontend CI: ${{ needs.trigger-frontend-ci.result || 'skipped' }}"
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.backend }}" == "true" ]]; then
+            echo "Backend CI: ${{ needs.trigger-backend-ci.result || 'skipped' }}"
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.infrastructure }}" == "true" ]]; then
+            echo "Infrastructure CI: ${{ needs.trigger-infrastructure-ci.result || 'skipped' }}"
+          fi
+
+          echo "Constitutional Compliance: ${{ needs.constitutional-compliance.result }}"
+          echo "Security Scan: ${{ needs.security-scan.result }}"
+
+          # Fail if any required job failed
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "❌ CI Pipeline Failed"
+            exit 1
+          else
+            echo "✅ CI Pipeline Passed"
+          fi

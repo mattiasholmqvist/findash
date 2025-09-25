@@ -1,0 +1,273 @@
+name: Infrastructure CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/ci-infrastructure.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/ci-infrastructure.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  validate:
+    name: Validate Infrastructure
+    runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Run infrastructure tests
+        run: npm test -- --coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./infrastructure/coverage/lcov.info
+          flags: infrastructure
+          name: infrastructure-coverage
+
+  cdk-synth:
+    name: CDK Synthesis
+    runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: CDK Synth - Development
+        run: npx cdk synth --all
+        env:
+          ENVIRONMENT: development
+          AWS_DEFAULT_REGION: eu-north-1
+
+      - name: CDK Synth - Staging
+        run: npx cdk synth --all
+        env:
+          ENVIRONMENT: staging
+          AWS_DEFAULT_REGION: eu-north-1
+
+      - name: CDK Synth - Production
+        run: npx cdk synth --all
+        env:
+          ENVIRONMENT: production
+          AWS_DEFAULT_REGION: eu-north-1
+
+      - name: Upload synthesized templates
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdk-templates
+          path: infrastructure/cdk.out/
+          retention-days: 7
+
+  security-scan:
+    name: Infrastructure Security Scan
+    runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: CDK Synth for security scan
+        run: npx cdk synth --all
+        env:
+          ENVIRONMENT: production
+          AWS_DEFAULT_REGION: eu-north-1
+
+      - name: Run cfn-lint on CloudFormation templates
+        run: |
+          pip install cfn-lint
+          find cdk.out -name "*.template.json" -type f | while read template; do
+            echo "Linting: $template"
+            cfn-lint -t "$template"
+          done
+
+      - name: Run Checkov security scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/cdk.out
+          framework: cloudformation
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+
+      - name: Upload Checkov results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: checkov-results.sarif
+
+  cost-analysis:
+    name: Cost Analysis
+    runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Infracost
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+          sudo mv infracost /usr/local/bin
+
+      - name: CDK Synth
+        run: npx cdk synth --all
+        env:
+          ENVIRONMENT: production
+          AWS_DEFAULT_REGION: eu-north-1
+
+      - name: Generate cost breakdown
+        run: |
+          for template in cdk.out/*.template.json; do
+            stack_name=$(basename "$template" .template.json)
+            echo "Analyzing costs for stack: $stack_name"
+            infracost breakdown \
+              --path "$template" \
+              --format json \
+              --out-file "cost-$stack_name.json"
+          done
+
+      - name: Post cost comment to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          infracost comment github \
+            --repo ${{ github.repository }} \
+            --pull-request ${{ github.event.pull_request.number }} \
+            --path "cost-*.json" \
+            --github-token ${{ secrets.GITHUB_TOKEN }}
+
+  compliance-validation:
+    name: Compliance Validation
+    runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate serverless architecture
+        run: |
+          echo "Validating serverless-first architecture..."
+
+          # Check for Lambda function definitions
+          if grep -r "aws_lambda.Function" src/; then
+            echo "✓ Lambda functions found"
+          else
+            echo "Warning: No Lambda functions found in infrastructure"
+          fi
+
+          # Check for DynamoDB tables
+          if grep -r "aws_dynamodb.Table" src/; then
+            echo "✓ DynamoDB tables found"
+          else
+            echo "Warning: No DynamoDB tables found in infrastructure"
+          fi
+
+          # Check for API Gateway
+          if grep -r "aws_apigateway" src/; then
+            echo "✓ API Gateway found"
+          else
+            echo "Warning: No API Gateway found in infrastructure"
+          fi
+
+          # Verify no EC2 instances (serverless-first)
+          if grep -r "aws_ec2.Instance" src/; then
+            echo "Error: EC2 instances found - violates serverless-first principle"
+            exit 1
+          fi
+
+      - name: Validate Swedish compliance requirements
+        run: |
+          echo "Checking Swedish market compliance support..."
+
+          # Check for proper data residency (EU regions)
+          if grep -r "eu-north-1\|eu-west-1\|eu-central-1" src/; then
+            echo "✓ EU region configured for data residency"
+          else
+            echo "Warning: Non-EU region detected - may violate GDPR requirements"
+          fi
+
+          # Check for encryption at rest
+          if grep -r "encryption\|encrypted" src/; then
+            echo "✓ Encryption configuration found"
+          else
+            echo "Warning: No encryption configuration found"
+          fi

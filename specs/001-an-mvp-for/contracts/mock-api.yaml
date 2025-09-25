@@ -1,0 +1,598 @@
+openapi: 3.0.3
+info:
+  title: FinDash Frontend MVP - Mock API Contracts
+  description: Mock API contracts for the frontend transaction viewer MVP
+  version: 1.0.0
+  contact:
+    name: FinDash Development Team
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local mock server
+
+paths:
+  /auth/login:
+    post:
+      summary: User authentication
+      description: Authenticate user with username and password
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: User logout
+      description: Invalidate user session
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transactions:
+    get:
+      summary: Get transactions list
+      description: Retrieve paginated list of accounting transactions with filtering
+      operationId: getTransactions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination (0-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Number of transactions per page
+          required: false
+          schema:
+            type: integer
+            minimum: 10
+            maximum: 100
+            default: 20
+        - name: dateFrom
+          in: query
+          description: Filter transactions from this date (YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          description: Filter transactions to this date (YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: basClass
+          in: query
+          description: Filter by Swedish BAS account class
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+        - name: accountId
+          in: query
+          description: Filter by specific account ID
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: search
+          in: query
+          description: Search in transaction descriptions
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: debitCredit
+          in: query
+          description: Filter by transaction type
+          required: false
+          schema:
+            type: string
+            enum: [DEBIT, CREDIT]
+      responses:
+        '200':
+          description: Successful response with transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transactions/{id}:
+    get:
+      summary: Get transaction details
+      description: Retrieve details of a specific transaction
+      operationId: getTransactionById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /accounts:
+    get:
+      summary: Get accounts list
+      description: Retrieve list of Swedish BAS chart of accounts
+      operationId: getAccounts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: basClass
+          in: query
+          description: Filter by BAS class
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+        - name: active
+          in: query
+          description: Filter by active status
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /mock-config:
+    get:
+      summary: Get mock data configuration
+      description: Retrieve current mock data service configuration
+      operationId: getMockConfig
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Mock configuration details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockConfigResponse'
+
+    put:
+      summary: Update mock data configuration
+      description: Update mock data generation parameters
+      operationId: updateMockConfig
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MockConfigRequest'
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockConfigResponse'
+        '400':
+          description: Invalid configuration parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9_]+$'
+        password:
+          type: string
+          minLength: 6
+          maxLength: 100
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT authentication token
+        user:
+          $ref: '#/components/schemas/User'
+        expiresIn:
+          type: integer
+          description: Token expiration time in seconds
+
+    LogoutResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Successfully logged out"
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - date
+        - description
+        - amount
+        - currency
+        - accountId
+        - basClass
+        - accountNumber
+        - debitCredit
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique transaction identifier
+        date:
+          type: string
+          format: date
+          description: Transaction date (YYYY-MM-DD)
+        description:
+          type: string
+          maxLength: 200
+          description: Transaction description
+        amount:
+          type: integer
+          description: Transaction amount in öre (Swedish currency subdivision)
+        currency:
+          type: string
+          enum: [SEK]
+          description: Currency code (always SEK for Swedish Kronor)
+        accountId:
+          type: string
+          format: uuid
+          description: Reference to account
+        account:
+          $ref: '#/components/schemas/Account'
+        basClass:
+          type: integer
+          minimum: 1
+          maximum: 8
+          description: Swedish BAS account class
+        accountNumber:
+          type: string
+          pattern: '^[0-9]{4}$'
+          description: 4-digit BAS account number
+        debitCredit:
+          type: string
+          enum: [DEBIT, CREDIT]
+          description: Transaction type
+        vatAmount:
+          type: integer
+          minimum: 0
+          description: VAT amount in öre (optional)
+        vatRate:
+          type: number
+          minimum: 0
+          maximum: 25
+          description: VAT rate percentage (optional)
+        reference:
+          type: string
+          maxLength: 50
+          description: Transaction reference or invoice number (optional)
+        createdAt:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last modification timestamp
+
+    Account:
+      type: object
+      required:
+        - id
+        - accountNumber
+        - name
+        - nameEnglish
+        - basClass
+        - basDescription
+        - isActive
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique account identifier
+        accountNumber:
+          type: string
+          pattern: '^[0-9]{4}$'
+          description: 4-digit BAS account number
+        name:
+          type: string
+          maxLength: 100
+          description: Account name in Swedish
+        nameEnglish:
+          type: string
+          maxLength: 100
+          description: Account name in English
+        basClass:
+          type: integer
+          minimum: 1
+          maximum: 8
+          description: BAS class (1-8)
+        basDescription:
+          type: string
+          description: BAS class description in Swedish
+        parentAccountId:
+          type: string
+          format: uuid
+          description: Parent account for hierarchy (optional)
+        isActive:
+          type: boolean
+          description: Account status
+        createdAt:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - firstName
+        - lastName
+        - role
+        - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          description: Unique username
+        email:
+          type: string
+          format: email
+          description: User email address
+        firstName:
+          type: string
+          maxLength: 50
+          description: User first name
+        lastName:
+          type: string
+          maxLength: 50
+          description: User last name
+        role:
+          type: string
+          enum: [VIEWER, ACCOUNTANT, CONTROLLER]
+          description: User role
+        isActive:
+          type: boolean
+          description: Account status
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: Last successful login timestamp
+
+    TransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        totalCount:
+          type: integer
+          description: Total number of transactions matching filters
+        summary:
+          $ref: '#/components/schemas/TransactionSummary'
+
+    AccountListResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        totalCount:
+          type: integer
+          description: Total number of accounts
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 0
+          description: Current page number (0-based)
+        size:
+          type: integer
+          minimum: 1
+          description: Items per page
+        hasNext:
+          type: boolean
+          description: Whether there are more pages
+        hasPrevious:
+          type: boolean
+          description: Whether there are previous pages
+
+    TransactionSummary:
+      type: object
+      properties:
+        totalAmount:
+          type: integer
+          description: Sum of all transaction amounts in öre
+        debitTotal:
+          type: integer
+          description: Sum of all debit transactions in öre
+        creditTotal:
+          type: integer
+          description: Sum of all credit transactions in öre
+        transactionCount:
+          type: integer
+          description: Number of transactions in current result set
+
+    MockConfigRequest:
+      type: object
+      properties:
+        datasetSize:
+          type: integer
+          minimum: 50
+          maximum: 10000
+          description: Number of transactions to generate
+        dateRangeStart:
+          type: string
+          format: date
+          description: Start date for transaction generation
+        dateRangeEnd:
+          type: string
+          format: date
+          description: End date for transaction generation
+        includeVAT:
+          type: boolean
+          description: Whether to include VAT in generated transactions
+        seed:
+          type: integer
+          description: Random seed for consistent data generation
+
+    MockConfigResponse:
+      type: object
+      properties:
+        datasetSize:
+          type: integer
+          description: Current dataset size
+        dateRange:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+        includeVAT:
+          type: boolean
+          description: VAT inclusion setting
+        lastGenerated:
+          type: string
+          format: date-time
+          description: Timestamp of last data generation
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details (optional)
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp

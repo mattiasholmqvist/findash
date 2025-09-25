@@ -1,0 +1,153 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-branch-naming:
+    name: Validate Branch Naming
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check branch naming convention
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          if [[ ! "$BRANCH_NAME" =~ ^[0-9]{3}-[a-z0-9-]+$ ]] && [[ "$BRANCH_NAME" != "main" ]]; then
+            echo "Error: Branch name '$BRANCH_NAME' does not follow the naming convention (###-feature-name)"
+            exit 1
+          fi
+          echo "Branch name '$BRANCH_NAME' follows the convention."
+
+  validate-commit-messages:
+    name: Validate Commit Messages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit message format
+        run: |
+          git log --format='%s' origin/${{ github.base_ref }}..HEAD | while read commit_msg; do
+            if [[ ! "$commit_msg" =~ ^(feat|fix|docs|style|refactor|test|chore|domain|event|infra|cqrs)(\([a-z-]+\))?:\ .+ ]]; then
+              echo "Error: Commit message does not follow conventional commits format:"
+              echo "  '$commit_msg'"
+              echo ""
+              echo "Expected format: <type>(<scope>): <description>"
+              echo "Valid types: feat, fix, docs, style, refactor, test, chore, domain, event, infra, cqrs"
+              exit 1
+            fi
+          done
+          echo "All commit messages follow the conventional commits format."
+
+  validate-specs:
+    name: Validate Feature Specifications
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, '0') || startsWith(github.head_ref, '1') || startsWith(github.head_ref, '2')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check feature directory structure
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          FEATURE_DIR="specs/$BRANCH_NAME"
+
+          if [ ! -d "$FEATURE_DIR" ]; then
+            echo "Warning: Feature directory $FEATURE_DIR not found."
+            echo "For feature branches, consider creating specifications using /specify command."
+            exit 0
+          fi
+
+          echo "Checking required specification files..."
+          REQUIRED_FILES=("spec.md" "plan.md" "tasks.md")
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$FEATURE_DIR/$file" ]; then
+              echo "Warning: Missing $file in $FEATURE_DIR"
+            else
+              echo "✓ Found $file"
+            fi
+          done
+
+  check-coverage-threshold:
+    name: Check Test Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check frontend coverage
+        working-directory: frontend
+        run: |
+          npm ci
+          npm test -- --coverage --silent
+
+          COVERAGE=$(grep -oP '(?<=Lines\s+:\s)\d+' coverage/lcov.info | head -1)
+
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "Error: Frontend test coverage is ${COVERAGE}%, which is below the required 80%"
+            exit 1
+          fi
+          echo "Frontend test coverage: ${COVERAGE}% ✓"
+
+      - name: Check backend coverage
+        working-directory: backend
+        run: |
+          npm ci
+          npm test -- --coverage --silent
+
+          COVERAGE=$(grep -oP '(?<=Lines\s+:\s)\d+' coverage/lcov.info | head -1)
+
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "Error: Backend test coverage is ${COVERAGE}%, which is below the required 80%"
+            exit 1
+          fi
+          echo "Backend test coverage: ${COVERAGE}% ✓"
+
+  pr-size-check:
+    name: PR Size Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR size
+        run: |
+          ADDITIONS=$(git diff --numstat origin/${{ github.base_ref }}..HEAD | awk '{ additions += $1 } END { print additions }')
+          DELETIONS=$(git diff --numstat origin/${{ github.base_ref }}..HEAD | awk '{ deletions += $2 } END { print deletions }')
+          TOTAL_CHANGES=$((ADDITIONS + DELETIONS))
+
+          echo "PR Statistics:"
+          echo "  Additions: $ADDITIONS"
+          echo "  Deletions: $DELETIONS"
+          echo "  Total Changes: $TOTAL_CHANGES"
+
+          if [ "$TOTAL_CHANGES" -gt 1000 ]; then
+            echo "Warning: This PR contains $TOTAL_CHANGES changes."
+            echo "Consider breaking it into smaller PRs for easier review."
+          fi
+
+  label-pr:
+    name: Auto-label PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Label based on files changed
+        uses: actions/labeler@v5
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml

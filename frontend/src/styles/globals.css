@@ -1,0 +1,1705 @@
+/**
+ * Global CSS styles with Swedish design system
+ * Constitutional compliance: Kebab-case filename, Swedish locale support
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Custom Properties for theming */
+:root {
+  /* Color palette - Swedish design inspired */
+  --color-primary: 27 78 142; /* Swedish blue */
+  --color-primary-foreground: 255 255 255;
+  --color-secondary: 241 245 249; /* Light gray */
+  --color-secondary-foreground: 51 65 85;
+
+  --color-accent: 234 179 8; /* Swedish yellow accent */
+  --color-accent-foreground: 22 22 22;
+
+  --color-background: 255 255 255;
+  --color-foreground: 15 23 42;
+  --color-muted: 248 250 252;
+  --color-muted-foreground: 100 116 139;
+
+  --color-border: 226 232 240;
+  --color-input: 255 255 255;
+  --color-ring: 59 130 246;
+
+  /* Status colors */
+  --color-success: 34 197 94;
+  --color-success-foreground: 255 255 255;
+  --color-warning: 251 191 36;
+  --color-warning-foreground: 22 22 22;
+  --color-error: 239 68 68;
+  --color-error-foreground: 255 255 255;
+  --color-info: 59 130 246;
+  --color-info-foreground: 255 255 255;
+
+  /* Swedish accounting colors */
+  --color-debit: 239 68 68; /* Red for debit */
+  --color-credit: 34 197 94; /* Green for credit */
+  --color-balance-positive: 34 197 94;
+  --color-balance-negative: 239 68 68;
+
+  /* Typography */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Spacing scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Dark theme */
+.dark {
+  --color-background: 15 23 42;
+  --color-foreground: 248 250 252;
+  --color-muted: 30 41 59;
+  --color-muted-foreground: 148 163 184;
+
+  --color-primary: 59 130 246;
+  --color-primary-foreground: 15 23 42;
+  --color-secondary: 30 41 59;
+  --color-secondary-foreground: 226 232 240;
+
+  --color-border: 51 65 85;
+  --color-input: 30 41 59;
+  --color-ring: 59 130 246;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-family-sans);
+  min-height: 100vh;
+}
+
+/* Typography styles */
+.typography {
+  @apply leading-relaxed;
+}
+
+.typography h1,
+.typography h2,
+.typography h3,
+.typography h4,
+.typography h5,
+.typography h6 {
+  @apply font-semibold leading-tight mb-4;
+}
+
+.typography h1 { @apply text-3xl md:text-4xl; }
+.typography h2 { @apply text-2xl md:text-3xl; }
+.typography h3 { @apply text-xl md:text-2xl; }
+.typography h4 { @apply text-lg md:text-xl; }
+.typography h5 { @apply text-base md:text-lg; }
+.typography h6 { @apply text-sm md:text-base; }
+
+.typography p {
+  @apply mb-4;
+}
+
+.typography ul,
+.typography ol {
+  @apply mb-4 pl-6;
+}
+
+.typography li {
+  @apply mb-1;
+}
+
+.typography strong {
+  @apply font-semibold;
+}
+
+.typography em {
+  @apply italic;
+}
+
+.typography code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.typography pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4;
+}
+
+.typography pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Component styles */
+@layer components {
+  /* Button variants */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600;
+  }
+
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+  }
+
+  .btn-warning {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-400;
+  }
+
+  .btn-error {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+
+  /* Form controls */
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-blue-400;
+  }
+
+  .form-input--error {
+    @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200;
+  }
+
+  .form-error {
+    @apply text-sm text-red-600 mt-1 dark:text-red-400;
+  }
+
+  .form-help {
+    @apply text-sm text-gray-500 mt-1 dark:text-gray-400;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700;
+  }
+
+  .card-body {
+    @apply px-6 py-4;
+  }
+
+  .card-footer {
+    @apply px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg dark:border-gray-700 dark:bg-gray-700;
+  }
+
+  /* Loading states */
+  .loading-spinner {
+    @apply inline-block animate-spin;
+  }
+
+  .loading-skeleton {
+    @apply bg-gray-200 animate-pulse rounded dark:bg-gray-700;
+  }
+
+  /* Currency formatting */
+  .currency-formatter {
+    @apply font-mono text-right;
+  }
+
+  .currency-formatter--negative {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .currency-formatter--positive {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .currency-formatter--zero {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  /* Debit/Credit indicators */
+  .debit-credit--debit {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .debit-credit--credit {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  /* Swedish accounting specific */
+  .bas-class-formatter {
+    @apply inline-flex items-center gap-1 text-sm;
+  }
+
+  .account-formatter {
+    @apply inline-flex items-center gap-2;
+  }
+
+  .account-number {
+    @apply font-mono text-sm bg-gray-100 px-2 py-1 rounded dark:bg-gray-700;
+  }
+
+  /* Transaction list styles */
+  .transaction-row {
+    @apply border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 dark:border-gray-700 dark:hover:bg-gray-800;
+  }
+
+  .transaction-row--selected {
+    @apply bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700;
+  }
+
+  .transaction-row--clickable {
+    @apply cursor-pointer;
+  }
+
+  /* Navigation styles */
+  .nav-link {
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white;
+  }
+
+  .nav-link--active {
+    @apply bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300;
+  }
+
+  /* Error states */
+  .error-boundary-fallback {
+    @apply min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900;
+  }
+
+  .error-content {
+    @apply max-w-md mx-auto text-center;
+  }
+
+  .error-icon {
+    @apply w-12 h-12 mx-auto text-red-500 mb-4;
+  }
+
+  /* Utility classes */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+
+  /* Animation classes */
+  .fade-in {
+    @apply animate-in fade-in duration-300;
+  }
+
+  .slide-in-from-top {
+    @apply animate-in slide-in-from-top duration-300;
+  }
+
+  .slide-in-from-bottom {
+    @apply animate-in slide-in-from-bottom duration-300;
+  }
+
+  .slide-in-from-left {
+    @apply animate-in slide-in-from-left duration-300;
+  }
+
+  .slide-in-from-right {
+    @apply animate-in slide-in-from-right duration-300;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-after {
+    page-break-after: always;
+  }
+
+  .print-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn {
+    @apply border-2 border-current;
+  }
+
+  .form-input {
+    @apply border-2;
+  }
+
+  .card {
+    @apply border-2;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .loading-spinner {
+    @apply animate-none;
+  }
+
+  .loading-skeleton {
+    @apply animate-none;
+  }
+}
+
+/* Swedish locale specific styles */
+[lang="sv"] .currency-formatter::before {
+  content: attr(data-currency, '');
+}
+
+/* Focus management for accessibility */
+.focus-trap {
+  @apply outline-none;
+}
+
+.focus-trap:focus-within {
+  @apply ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 640px) {
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .tablet-visible {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-visible {
+    display: block;
+  }
+}
+
+/* Header Navigation Styles */
+.header-navigation {
+  @apply bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50;
+}
+
+.dark .header-navigation {
+  @apply bg-slate-900 border-slate-700;
+}
+
+.header-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  @apply flex items-center justify-between h-16;
+}
+
+.header-brand {
+  @apply flex items-center flex-shrink-0;
+}
+
+.brand-link {
+  @apply flex items-center space-x-3 no-underline;
+}
+
+.brand-logo {
+  @apply flex-shrink-0;
+}
+
+.logo-svg {
+  @apply w-8 h-8 text-blue-600;
+}
+
+.dark .logo-svg {
+  @apply text-blue-400;
+}
+
+.logo-text {
+  @apply text-sm font-bold fill-current;
+}
+
+.brand-name {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.dark .brand-name {
+  @apply text-white;
+}
+
+.desktop-navigation {
+  @apply hidden md:block;
+}
+
+.nav-list {
+  @apply flex space-x-8 list-none m-0 p-0;
+}
+
+.nav-item {
+  @apply relative;
+}
+
+.nav-link {
+  @apply flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-blue-600 hover:bg-blue-50 transition-colors no-underline;
+}
+
+.dark .nav-link {
+  @apply text-gray-300 hover:text-blue-400 hover:bg-slate-800;
+}
+
+.nav-link--active {
+  @apply text-blue-600 bg-blue-50;
+}
+
+.dark .nav-link--active {
+  @apply text-blue-400 bg-slate-800;
+}
+
+.nav-icon {
+  @apply w-5 h-5 flex-shrink-0;
+}
+
+.header-user {
+  @apply relative;
+}
+
+.user-menu-button {
+  @apply flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 p-2 hover:bg-gray-50;
+}
+
+.dark .user-menu-button {
+  @apply hover:bg-slate-800 focus:ring-blue-400;
+}
+
+.user-avatar {
+  @apply w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center;
+}
+
+.avatar-initials {
+  @apply text-xs font-medium text-white;
+}
+
+.user-info {
+  @apply hidden sm:block text-left;
+}
+
+.user-name {
+  @apply text-sm font-medium text-gray-900;
+}
+
+.dark .user-name {
+  @apply text-white;
+}
+
+.user-role {
+  @apply text-xs text-gray-500;
+}
+
+.dark .user-role {
+  @apply text-gray-400;
+}
+
+.dropdown-arrow {
+  @apply w-4 h-4 text-gray-400;
+}
+
+.user-menu {
+  @apply absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50;
+}
+
+.dark .user-menu {
+  @apply bg-slate-800 ring-slate-700;
+}
+
+.user-menu-header {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.dark .user-menu-header {
+  @apply border-slate-700;
+}
+
+.user-details {
+  @apply space-y-1;
+}
+
+.user-full-name {
+  @apply text-sm font-medium text-gray-900;
+}
+
+.dark .user-full-name {
+  @apply text-white;
+}
+
+.user-email {
+  @apply text-sm text-gray-500;
+}
+
+.dark .user-email {
+  @apply text-gray-400;
+}
+
+.user-role-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+}
+
+.dark .user-role-badge {
+  @apply bg-blue-900 text-blue-200;
+}
+
+.user-menu-divider {
+  @apply border-t border-gray-200;
+}
+
+.dark .user-menu-divider {
+  @apply border-slate-700;
+}
+
+.user-menu-items {
+  @apply py-1;
+}
+
+.user-menu-item {
+  @apply flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left border-none bg-transparent cursor-pointer;
+}
+
+.dark .user-menu-item {
+  @apply text-gray-300 hover:bg-slate-700;
+}
+
+.user-menu-item--danger {
+  @apply text-red-700 hover:bg-red-50;
+}
+
+.dark .user-menu-item--danger {
+  @apply text-red-400 hover:bg-red-900/20;
+}
+
+.menu-item-icon {
+  @apply w-4 h-4 flex-shrink-0;
+}
+
+.mobile-menu-button {
+  @apply md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500;
+}
+
+.dark .mobile-menu-button {
+  @apply text-gray-300 hover:text-gray-200 hover:bg-slate-800 focus:ring-blue-400;
+}
+
+.mobile-navigation {
+  @apply md:hidden bg-white border-t border-gray-200 shadow-lg;
+}
+
+.dark .mobile-navigation {
+  @apply bg-slate-900 border-slate-700;
+}
+
+.mobile-nav-header {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.dark .mobile-nav-header {
+  @apply border-slate-700;
+}
+
+.mobile-user-info {
+  @apply flex items-center space-x-3;
+}
+
+.mobile-user-avatar {
+  @apply w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0;
+}
+
+.mobile-user-details {
+  @apply flex-1 min-w-0;
+}
+
+.mobile-user-name {
+  @apply text-sm font-medium text-gray-900 truncate;
+}
+
+.dark .mobile-user-name {
+  @apply text-white;
+}
+
+.mobile-user-email {
+  @apply text-sm text-gray-500 truncate;
+}
+
+.dark .mobile-user-email {
+  @apply text-gray-400;
+}
+
+.mobile-nav-menu {
+  @apply px-2 pt-2 pb-3 space-y-1;
+}
+
+.mobile-nav-link {
+  @apply flex items-center space-x-3 px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-blue-600 hover:bg-blue-50 no-underline;
+}
+
+.dark .mobile-nav-link {
+  @apply text-gray-300 hover:text-blue-400 hover:bg-slate-800;
+}
+
+.mobile-nav-link--active {
+  @apply text-blue-600 bg-blue-50;
+}
+
+.dark .mobile-nav-link--active {
+  @apply text-blue-400 bg-slate-800;
+}
+
+.mobile-nav-icon {
+  @apply w-5 h-5 flex-shrink-0;
+}
+
+.mobile-nav-divider {
+  @apply border-t border-gray-200;
+}
+
+.dark .mobile-nav-divider {
+  @apply border-slate-700;
+}
+
+.mobile-nav-actions {
+  @apply px-2 py-3 space-y-1;
+}
+
+.mobile-nav-action {
+  @apply flex items-center space-x-3 px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:bg-gray-100 w-full text-left border-none bg-transparent;
+}
+
+.dark .mobile-nav-action {
+  @apply text-gray-300 hover:bg-slate-700;
+}
+
+.mobile-nav-action--danger {
+  @apply text-red-700 hover:bg-red-50;
+}
+
+.dark .mobile-nav-action--danger {
+  @apply text-red-400 hover:bg-red-900/20;
+}
+
+.mobile-action-icon {
+  @apply w-5 h-5 flex-shrink-0;
+}
+
+/* Page Content Styles */
+.transaction-viewer-page {
+  @apply min-h-screen bg-gray-50;
+}
+
+.dark .transaction-viewer-page {
+  @apply bg-slate-900;
+}
+
+.page-content {
+  @apply flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6;
+}
+
+.page-header {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.dark .page-header {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.page-title-section {
+  @apply flex flex-col space-y-2;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-900 leading-7;
+}
+
+.dark .page-title {
+  @apply text-white;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-500 leading-5;
+}
+
+.dark .page-subtitle {
+  @apply text-gray-400;
+}
+
+.page-summary {
+  @apply mt-6 pt-6 border-t border-gray-200;
+}
+
+.dark .page-summary {
+  @apply border-slate-700;
+}
+
+.summary-card {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+.page-error {
+  @apply bg-red-50 border border-red-200 rounded-lg p-4;
+}
+
+.dark .page-error {
+  @apply bg-red-900/20 border-red-800/30;
+}
+
+.error-content {
+  @apply flex items-start space-x-3;
+}
+
+.error-icon {
+  @apply w-5 h-5 text-red-400 flex-shrink-0 mt-0.5;
+}
+
+.error-message {
+  @apply flex-1;
+}
+
+.error-message h3 {
+  @apply text-sm font-medium text-red-800 mb-1;
+}
+
+.dark .error-message h3 {
+  @apply text-red-400;
+}
+
+.error-message p {
+  @apply text-sm text-red-700;
+}
+
+.dark .error-message p {
+  @apply text-red-300;
+}
+
+.error-dismiss {
+  @apply mt-3 text-xs font-medium text-red-600 hover:text-red-500 underline cursor-pointer bg-transparent border-none p-0;
+}
+
+.dark .error-dismiss {
+  @apply text-red-400 hover:text-red-300;
+}
+
+.page-filters {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.dark .page-filters {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.filters-card {
+  @apply space-y-4;
+}
+
+.page-transactions {
+  @apply space-y-4;
+}
+
+.transaction-list-card {
+  @apply w-full;
+}
+
+.empty-transactions {
+  @apply py-12;
+}
+
+.empty-state {
+  @apply text-center;
+}
+
+.empty-icon {
+  @apply w-12 h-12 mx-auto text-gray-400 mb-4;
+}
+
+.dark .empty-icon {
+  @apply text-gray-500;
+}
+
+.empty-state h3 {
+  @apply text-lg font-medium text-gray-900 mb-2;
+}
+
+.dark .empty-state h3 {
+  @apply text-white;
+}
+
+.empty-state p {
+  @apply text-sm text-gray-500 mb-6 max-w-sm mx-auto;
+}
+
+.dark .empty-state p {
+  @apply text-gray-400;
+}
+
+.clear-filters-button {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+}
+
+.dark .clear-filters-button {
+  @apply bg-blue-700 hover:bg-blue-600 focus:ring-blue-400;
+}
+
+.load-more-indicator {
+  @apply flex justify-center py-4;
+}
+
+.transaction-details-panel {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.dark .transaction-details-panel {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.details-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.details-header h3 {
+  @apply text-lg font-medium text-gray-900;
+}
+
+.dark .details-header h3 {
+  @apply text-white;
+}
+
+.close-details {
+  @apply text-gray-400 hover:text-gray-500 p-1 rounded-md hover:bg-gray-100 bg-transparent border-none cursor-pointer;
+}
+
+.dark .close-details {
+  @apply text-gray-500 hover:text-gray-400 hover:bg-slate-700;
+}
+
+.close-details svg {
+  @apply w-5 h-5;
+}
+
+.details-content {
+  @apply space-y-3;
+}
+
+.detail-row {
+  @apply flex justify-between py-2 border-b border-gray-100 last:border-b-0;
+}
+
+.dark .detail-row {
+  @apply border-slate-700;
+}
+
+.detail-label {
+  @apply text-sm font-medium text-gray-500 flex-shrink-0 w-24;
+}
+
+.dark .detail-label {
+  @apply text-gray-400;
+}
+
+.detail-value {
+  @apply text-sm text-gray-900 font-mono;
+}
+
+.dark .detail-value {
+  @apply text-white;
+}
+
+/* Form and Filter Styles */
+.filter-section {
+  @apply space-y-6;
+}
+
+.filter-group {
+  @apply space-y-4;
+}
+
+.filter-row {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.filter-field {
+  @apply space-y-2;
+}
+
+.filter-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.dark .filter-label {
+  @apply text-gray-300;
+}
+
+.filter-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900;
+}
+
+.dark .filter-input {
+  @apply bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-blue-400 focus:border-transparent;
+}
+
+.filter-select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.dark .filter-select {
+  @apply bg-slate-700 border-slate-600 text-white focus:ring-blue-400 focus:border-transparent;
+}
+
+.filter-date {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.dark .filter-date {
+  @apply bg-slate-700 border-slate-600 text-white focus:ring-blue-400 focus:border-transparent;
+}
+
+.filter-checkbox {
+  @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded;
+}
+
+.dark .filter-checkbox {
+  @apply bg-slate-700 border-slate-600 focus:ring-blue-400;
+}
+
+.filter-checkbox-label {
+  @apply ml-2 text-sm text-gray-700;
+}
+
+.dark .filter-checkbox-label {
+  @apply text-gray-300;
+}
+
+.filter-actions {
+  @apply flex flex-wrap gap-3 pt-4 border-t border-gray-200;
+}
+
+.dark .filter-actions {
+  @apply border-slate-700;
+}
+
+.filter-button {
+  @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.filter-button--primary {
+  @apply text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.dark .filter-button--primary {
+  @apply bg-blue-700 hover:bg-blue-600 focus:ring-blue-400;
+}
+
+.filter-button--secondary {
+  @apply text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-blue-500;
+}
+
+.dark .filter-button--secondary {
+  @apply text-gray-300 bg-slate-700 border-slate-600 hover:bg-slate-600 focus:ring-blue-400;
+}
+
+.filter-button--danger {
+  @apply text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 focus:ring-red-500;
+}
+
+.dark .filter-button--danger {
+  @apply text-red-400 bg-red-900/20 border-red-800/30 hover:bg-red-900/30 focus:ring-red-400;
+}
+
+.filter-toggle {
+  @apply flex items-center justify-between py-3 cursor-pointer;
+}
+
+.filter-toggle-label {
+  @apply text-lg font-medium text-gray-900 flex items-center space-x-2;
+}
+
+.dark .filter-toggle-label {
+  @apply text-white;
+}
+
+.filter-toggle-icon {
+  @apply w-5 h-5 text-gray-400 transition-transform duration-200;
+}
+
+.filter-toggle--open .filter-toggle-icon {
+  @apply transform rotate-180;
+}
+
+.filter-content {
+  @apply transition-all duration-200 ease-in-out overflow-hidden;
+}
+
+.filter-content--closed {
+  @apply max-h-0 opacity-0;
+}
+
+.filter-content--open {
+  @apply max-h-screen opacity-100 pb-4;
+}
+
+/* Loading States for Filters */
+.filter-loading {
+  @apply animate-pulse;
+}
+
+.filter-skeleton {
+  @apply h-4 bg-gray-200 rounded w-3/4 mb-2;
+}
+
+.dark .filter-skeleton {
+  @apply bg-slate-700;
+}
+
+.filter-skeleton--input {
+  @apply h-10 bg-gray-200 rounded w-full;
+}
+
+.dark .filter-skeleton--input {
+  @apply bg-slate-700;
+}
+
+/* Transaction List Styles */
+.transaction-list {
+  @apply w-full border border-gray-200 rounded-lg overflow-hidden;
+}
+
+.dark .transaction-list {
+  @apply border-slate-700;
+}
+
+.transaction-header {
+  @apply bg-white border-b border-gray-200 px-6 py-3;
+}
+
+.dark .transaction-header {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.transaction-header-row {
+  @apply grid grid-cols-12 gap-6 text-xs font-medium text-gray-500 uppercase tracking-wide px-6 py-4;
+}
+
+.dark .transaction-header-row {
+  @apply text-gray-400;
+}
+
+.transaction-row {
+  @apply grid grid-cols-12 gap-6 px-6 py-6 bg-white border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors;
+}
+
+.dark .transaction-row {
+  @apply bg-slate-800 border-slate-700 hover:bg-slate-700;
+}
+
+.transaction-row--selected {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.dark .transaction-row--selected {
+  @apply bg-blue-900/20 border-blue-700;
+}
+
+.transaction-cell {
+  @apply text-sm text-gray-900 flex items-center leading-relaxed;
+}
+
+.transaction-cell.col-span-2 {
+  grid-column: span 2;
+}
+
+.dark .transaction-cell {
+  @apply text-white;
+}
+
+.transaction-cell--date {
+  @apply font-mono text-xs;
+}
+
+.transaction-cell--description {
+  @apply flex flex-col;
+}
+
+.transaction-description-primary {
+  @apply font-medium text-gray-900 leading-tight;
+}
+
+.dark .transaction-description-primary {
+  @apply text-white;
+}
+
+.transaction-reference {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .transaction-reference {
+  @apply text-gray-400;
+}
+
+.transaction-cell--account {
+  @apply flex flex-col;
+}
+
+.account-number {
+  @apply font-mono text-xs text-gray-500 font-medium;
+}
+
+.dark .account-number {
+  @apply text-gray-400;
+}
+
+.account-name {
+  @apply text-sm text-gray-900 mt-1;
+}
+
+.dark .account-name {
+  @apply text-white;
+}
+
+.transaction-cell--bas {
+  @apply flex flex-col;
+}
+
+.bas-class-number {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.dark .bas-class-number {
+  @apply text-gray-400;
+}
+
+.bas-class-name {
+  @apply text-sm text-gray-900 mt-1;
+}
+
+.dark .bas-class-name {
+  @apply text-white;
+}
+
+.transaction-cell--vat {
+  @apply flex flex-col;
+}
+
+.transaction-vat {
+  @apply flex flex-col;
+}
+
+.vat-amount {
+  @apply font-mono text-xs font-medium;
+}
+
+.vat-rate {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .vat-rate {
+  @apply text-gray-400;
+}
+
+.transaction-cell--amount {
+  @apply flex flex-col items-end font-mono;
+}
+
+.amount-value {
+  @apply font-medium text-base;
+}
+
+.amount-type {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .amount-type {
+  @apply text-gray-400;
+}
+
+.transaction-cell--debit {
+  @apply text-red-600;
+}
+
+.dark .transaction-cell--debit {
+  @apply text-red-400;
+}
+
+.transaction-cell--credit {
+  @apply text-green-600;
+}
+
+.dark .transaction-cell--credit {
+  @apply text-green-400;
+}
+
+.transaction-cell--account {
+  @apply font-mono text-xs;
+}
+
+.transaction-cell--description {
+  @apply truncate;
+}
+
+/* Summary Stats Styles */
+.summary-stats {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+.summary-stat {
+  @apply bg-gray-50 rounded-lg p-4 text-center;
+}
+
+.dark .summary-stat {
+  @apply bg-slate-800;
+}
+
+.summary-stat-label {
+  @apply text-xs font-medium text-gray-500 uppercase tracking-wide mb-1;
+}
+
+.dark .summary-stat-label {
+  @apply text-gray-400;
+}
+
+.summary-stat-value {
+  @apply text-2xl font-bold text-gray-900 font-mono;
+}
+
+.dark .summary-stat-value {
+  @apply text-white;
+}
+
+.summary-stat-value--positive {
+  @apply text-green-600;
+}
+
+.dark .summary-stat-value--positive {
+  @apply text-green-400;
+}
+
+.summary-stat-value--negative {
+  @apply text-red-600;
+}
+
+.dark .summary-stat-value--negative {
+  @apply text-red-400;
+}
+
+/* Transaction Filter Component Styles */
+.transaction-filter {
+  @apply space-y-4;
+}
+
+.filter-header {
+  @apply flex items-center justify-between;
+}
+
+.filter-toggle {
+  @apply flex items-center space-x-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors border-none text-left w-auto;
+}
+
+.dark .filter-toggle {
+  @apply bg-slate-800 hover:bg-slate-700;
+}
+
+.filter-toggle--expanded {
+  @apply bg-blue-50 text-blue-700;
+}
+
+.dark .filter-toggle--expanded {
+  @apply bg-blue-900/20 text-blue-400;
+}
+
+.filter-icon {
+  @apply w-5 h-5 text-gray-600 flex-shrink-0;
+}
+
+.dark .filter-icon {
+  @apply text-gray-400;
+}
+
+.filter-toggle--expanded .filter-icon {
+  @apply text-blue-600;
+}
+
+.dark .filter-toggle--expanded .filter-icon {
+  @apply text-blue-400;
+}
+
+.filter-label-text {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.dark .filter-label-text {
+  @apply text-gray-300;
+}
+
+.filter-toggle--expanded .filter-label-text {
+  @apply text-blue-700;
+}
+
+.dark .filter-toggle--expanded .filter-label-text {
+  @apply text-blue-400;
+}
+
+.filter-toggle-arrow {
+  @apply w-4 h-4 text-gray-400 transition-transform duration-200 ml-auto;
+}
+
+.filter-toggle--expanded .filter-toggle-arrow {
+  @apply transform rotate-180 text-blue-600;
+}
+
+.dark .filter-toggle--expanded .filter-toggle-arrow {
+  @apply text-blue-400;
+}
+
+.reset-filters {
+  @apply px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors border-none cursor-pointer;
+}
+
+.dark .reset-filters {
+  @apply text-red-400 hover:text-red-300 bg-red-900/20 hover:bg-red-900/30;
+}
+
+.filter-panel {
+  @apply transition-all duration-300 ease-in-out overflow-hidden;
+}
+
+.filter-panel:not(.filter-panel--expanded) {
+  @apply max-h-0 opacity-0;
+}
+
+.filter-panel--expanded {
+  @apply max-h-screen opacity-100 mt-4;
+}
+
+.filter-section {
+  @apply space-y-4 py-4 border-b border-gray-200 last:border-b-0;
+}
+
+.dark .filter-section {
+  @apply border-slate-700;
+}
+
+.filter-section-title {
+  @apply text-sm font-medium text-gray-900 mb-3;
+}
+
+.dark .filter-section-title {
+  @apply text-white;
+}
+
+.filter-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.filter-grid--two-cols {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.apply-filters {
+  @apply w-full md:w-auto px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 border-none cursor-pointer;
+}
+
+.dark .apply-filters {
+  @apply bg-blue-700 hover:bg-blue-600 focus:ring-blue-400;
+}
+
+.apply-filters--disabled {
+  @apply opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400;
+}
+
+.dark .apply-filters--disabled {
+  @apply bg-gray-600 hover:bg-gray-600;
+}
+
+.loading-spinner {
+  @apply w-4 h-4 animate-spin;
+}
+
+.error-text {
+  @apply text-xs text-red-600 mt-1;
+}
+
+.dark .error-text {
+  @apply text-red-400;
+}
+
+.filter-input--error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.dark .filter-input--error {
+  @apply border-red-600 focus:ring-red-400 focus:border-red-400;
+}
+
+.filter-select--error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.dark .filter-select--error {
+  @apply border-red-600 focus:ring-red-400 focus:border-red-400;
+}
+
+/* Additional Filter Toggle Elements */
+.expand-icon {
+  @apply w-4 h-4 text-gray-400 transition-transform duration-200 ml-auto;
+}
+
+.dark .expand-icon {
+  @apply text-gray-500;
+}
+
+.filter-toggle--expanded .expand-icon {
+  @apply transform rotate-180 text-blue-600;
+}
+
+.dark .filter-toggle--expanded .expand-icon {
+  @apply text-blue-400;
+}
+
+.active-filter-count {
+  @apply text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full ml-2;
+}
+
+.dark .active-filter-count {
+  @apply text-blue-400 bg-blue-900/30;
+}
+
+.filter-toggle--expanded .active-filter-count {
+  @apply text-blue-700 bg-blue-200;
+}
+
+.dark .filter-toggle--expanded .active-filter-count {
+  @apply text-blue-300 bg-blue-800/40;
+}
+
+/* Transaction List Component Styles */
+.transaction-list-container {
+  @apply w-full border border-gray-200 rounded-lg overflow-hidden bg-white;
+}
+
+.dark .transaction-list-container {
+  @apply border-slate-700 bg-slate-800;
+}
+
+.transaction-list-header {
+  @apply bg-gray-50 border-b border-gray-200 px-6 py-3;
+}
+
+.dark .transaction-list-header {
+  @apply bg-slate-800 border-slate-700;
+}
+
+.transaction-header-grid {
+  @apply grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wide;
+}
+
+.dark .transaction-header-grid {
+  @apply text-gray-400;
+}
+
+.transaction-row {
+  @apply border-b border-gray-100 hover:bg-gray-50 transition-colors;
+}
+
+.dark .transaction-row {
+  @apply border-slate-700 hover:bg-slate-700;
+}
+
+.transaction-row--selected {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.dark .transaction-row--selected {
+  @apply bg-blue-900/20 border-blue-700;
+}
+
+.transaction-row--clickable {
+  @apply cursor-pointer;
+}
+
+.transaction-row--loading {
+  @apply animate-pulse;
+}
+
+.transaction-content {
+  @apply px-6 py-4;
+}
+
+.transaction-main {
+  @apply flex items-center justify-between space-x-4;
+}
+
+.transaction-date {
+  @apply text-xs font-mono text-gray-500 flex-shrink-0 w-20;
+}
+
+.dark .transaction-date {
+  @apply text-gray-400;
+}
+
+.transaction-description {
+  @apply flex-1 min-w-0;
+}
+
+.transaction-description-primary {
+  @apply text-sm font-medium text-gray-900 truncate;
+}
+
+.dark .transaction-description-primary {
+  @apply text-white;
+}
+
+.transaction-reference {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .transaction-reference {
+  @apply text-gray-400;
+}
+
+.transaction-amount {
+  @apply text-right flex-shrink-0 w-24;
+}
+
+.amount-value {
+  @apply block text-sm font-mono font-medium;
+}
+
+.amount-type {
+  @apply block text-xs text-gray-500 uppercase;
+}
+
+.dark .amount-type {
+  @apply text-gray-400;
+}
+
+.transaction-amount--debit .amount-value {
+  @apply text-red-600;
+}
+
+.dark .transaction-amount--debit .amount-value {
+  @apply text-red-400;
+}
+
+.transaction-amount--credit .amount-value {
+  @apply text-green-600;
+}
+
+.dark .transaction-amount--credit .amount-value {
+  @apply text-green-400;
+}
+
+.transaction-secondary {
+  @apply flex items-center justify-between mt-2 text-xs text-gray-500;
+}
+
+.dark .transaction-secondary {
+  @apply text-gray-400;
+}
+
+.transaction-account {
+  @apply font-mono;
+}
+
+.transaction-class {
+  @apply text-gray-400;
+}
+
+.dark .transaction-class {
+  @apply text-gray-500;
+}
+
+.transaction-loading {
+  @apply px-6 py-4 space-y-2;
+}
+
+.loading-skeleton {
+  @apply bg-gray-200 rounded animate-pulse;
+}
+
+.dark .loading-skeleton {
+  @apply bg-slate-700;
+}
+
+.loading-skeleton--date {
+  @apply h-3 w-16;
+}
+
+.loading-skeleton--description {
+  @apply h-4 w-48;
+}
+
+.loading-skeleton--amount {
+  @apply h-4 w-20 ml-auto;
+}
+
+.loading-skeleton--account {
+  @apply h-3 w-24;
+}

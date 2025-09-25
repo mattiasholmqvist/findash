@@ -1,0 +1,68 @@
+frontend:
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/**/*
+      - '*.tsx'
+      - '*.ts'
+
+backend:
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/**/*
+      - backend/src/**/*.ts
+
+infrastructure:
+  - changed-files:
+    - any-glob-to-any-file:
+      - infrastructure/**/*
+      - '**/*.cdk.ts'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - docs/**/*
+      - specs/**/*.md
+
+domain:
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/src/domain/**/*
+
+event-sourcing:
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/src/infrastructure/event-store/**/*
+      - backend/src/domain/events/**/*
+
+cqrs:
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/src/application/commands/**/*
+      - backend/src/application/queries/**/*
+
+testing:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.test.ts'
+      - '**/*.spec.ts'
+      - '**/*.test.tsx'
+      - '**/test/**/*'
+      - '**/tests/**/*'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/package.json'
+      - '**/package-lock.json'
+
+github-actions:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**/*
+
+specify-framework:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .specify/**/*
+      - specs/**/*

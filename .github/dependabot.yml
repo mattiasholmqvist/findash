@@ -1,0 +1,63 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      testing:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    groups:
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+      testing:
+        patterns:
+          - "jest*"
+          - "@types/jest"
+      serverless:
+        patterns:
+          - "serverless*"
+          - "@types/aws-lambda"
+
+  - package-ecosystem: "npm"
+    directory: "/infrastructure"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    groups:
+      aws-cdk:
+        patterns:
+          - "aws-cdk*"
+          - "@aws-cdk/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 3
