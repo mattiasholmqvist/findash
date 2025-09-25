@@ -30,14 +30,14 @@ export interface PaginationParams {
 
 // Transaction API types
 export interface GetTransactionsParams extends PaginationParams {
-  readonly dateFrom?: string // YYYY-MM-DD format
-  readonly dateTo?: string // YYYY-MM-DD format
-  readonly basClass?: number // 1-8
-  readonly accountId?: string // UUID
-  readonly search?: string // Search in descriptions
-  readonly debitCredit?: 'DEBIT' | 'CREDIT'
-  readonly minAmount?: number // Amount in öre
-  readonly maxAmount?: number // Amount in öre
+  dateFrom?: string // YYYY-MM-DD format
+  dateTo?: string // YYYY-MM-DD format
+  basClass?: number // 1-8
+  accountId?: string // UUID
+  search?: string // Search in descriptions
+  debitCredit?: 'DEBIT' | 'CREDIT'
+  minAmount?: number // Amount in öre
+  maxAmount?: number // Amount in öre
 }
 
 export interface GetTransactionByIdParams {
