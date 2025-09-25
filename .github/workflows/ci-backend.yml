@@ -1,0 +1,230 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci-backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci-backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  test:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Run unit tests
+        run: npm test -- --coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+      - name: Build Lambda functions
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: backend/dist/
+          retention-days: 7
+
+  domain-tests:
+    name: Domain Layer Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run domain tests
+        run: npm test -- --testPathPattern=domain --coverage
+
+      - name: Validate domain model integrity
+        run: |
+          echo "Checking domain model structure..."
+          if [ ! -d "src/domain" ]; then
+            echo "Error: Domain directory not found"
+            exit 1
+          fi
+
+          # Check for required domain subdirectories
+          for dir in aggregates entities value-objects events; do
+            if [ ! -d "src/domain/$dir" ]; then
+              echo "Warning: src/domain/$dir not found"
+            fi
+          done
+
+  event-sourcing-tests:
+    name: Event Sourcing Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run event sourcing tests
+        run: npm test -- --testPathPattern=event --coverage
+
+      - name: Validate event schemas
+        run: |
+          echo "Validating event schemas..."
+          if [ -d "src/domain/events" ]; then
+            find src/domain/events -name "*.ts" -type f | while read file; do
+              echo "Checking event schema in: $file"
+              # Verify events have version property
+              if ! grep -q "version:" "$file"; then
+                echo "Warning: Event in $file may be missing version property"
+              fi
+            done
+          fi
+
+  cqrs-validation:
+    name: CQRS Pattern Validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CQRS tests
+        run: npm test -- --testPathPattern="(command|query)" --coverage
+
+      - name: Validate CQRS structure
+        run: |
+          echo "Validating CQRS pattern implementation..."
+
+          # Check command handlers
+          if [ -d "src/application/commands" ]; then
+            echo "✓ Command handlers directory found"
+            COMMAND_COUNT=$(find src/application/commands -name "*.ts" -type f | wc -l)
+            echo "  Found $COMMAND_COUNT command handler files"
+          else
+            echo "Warning: Command handlers directory not found"
+          fi
+
+          # Check query handlers
+          if [ -d "src/application/queries" ]; then
+            echo "✓ Query handlers directory found"
+            QUERY_COUNT=$(find src/application/queries -name "*.ts" -type f | wc -l)
+            echo "  Found $QUERY_COUNT query handler files"
+          else
+            echo "Warning: Query handlers directory not found"
+          fi
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports:
+          - 8000:8000
+        options: >-
+          --health-cmd "curl -f http://localhost:8000 || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DYNAMODB_ENDPOINT: http://localhost:8000
+          AWS_REGION: eu-north-1
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-integration-test-results
+          path: backend/test-results/
+          retention-days: 7

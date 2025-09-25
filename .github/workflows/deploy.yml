@@ -1,0 +1,267 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  determine-environment:
+    name: Determine Deployment Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      aws-account: ${{ steps.set-env.outputs.aws-account }}
+
+    steps:
+      - name: Set environment variables
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          else
+            ENV="staging"
+          fi
+
+          case $ENV in
+            development)
+              AWS_ACCOUNT="${{ secrets.AWS_ACCOUNT_DEV }}"
+              ;;
+            staging)
+              AWS_ACCOUNT="${{ secrets.AWS_ACCOUNT_STAGING }}"
+              ;;
+            production)
+              AWS_ACCOUNT="${{ secrets.AWS_ACCOUNT_PROD }}"
+              ;;
+          esac
+
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          echo "aws-account=$AWS_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "Deploying to: $ENV environment"
+
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: determine-environment
+    environment: ${{ needs.determine-environment.outputs.environment }}
+    defaults:
+      run:
+        working-directory: infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ needs.determine-environment.outputs.aws-account }}:role/GitHubActionsRole
+          role-session-name: GitHub-Actions-Deploy
+          aws-region: eu-north-1
+
+      - name: Run CDK diff
+        run: npx cdk diff --all
+        env:
+          ENVIRONMENT: ${{ needs.determine-environment.outputs.environment }}
+
+      - name: Deploy CDK stacks
+        run: npx cdk deploy --all --require-approval never
+        env:
+          ENVIRONMENT: ${{ needs.determine-environment.outputs.environment }}
+
+      - name: Output stack information
+        run: |
+          npx cdk list | while read stack; do
+            echo "Stack: $stack"
+            aws cloudformation describe-stacks --stack-name $stack --query 'Stacks[0].Outputs' --output table
+          done
+
+  deploy-backend:
+    name: Deploy Backend Services
+    runs-on: ubuntu-latest
+    needs: [determine-environment, deploy-infrastructure]
+    environment: ${{ needs.determine-environment.outputs.environment }}
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ needs.determine-environment.outputs.aws-account }}:role/GitHubActionsRole
+          role-session-name: GitHub-Actions-Deploy
+          aws-region: eu-north-1
+
+      - name: Deploy Lambda functions
+        run: |
+          for func_dir in dist/functions/*/; do
+            func_name=$(basename $func_dir)
+            echo "Deploying Lambda function: $func_name"
+
+            cd $func_dir
+            zip -r function.zip .
+
+            aws lambda update-function-code \
+              --function-name "findash-${{ needs.determine-environment.outputs.environment }}-$func_name" \
+              --zip-file fileb://function.zip \
+              --region eu-north-1
+
+            cd -
+          done
+
+      - name: Run database migrations
+        run: |
+          echo "Running DynamoDB migrations..."
+          npm run migrate:${{ needs.determine-environment.outputs.environment }}
+
+  deploy-frontend:
+    name: Deploy Frontend Application
+    runs-on: ubuntu-latest
+    needs: [determine-environment, deploy-infrastructure]
+    environment: ${{ needs.determine-environment.outputs.environment }}
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
+          VITE_ENVIRONMENT: ${{ needs.determine-environment.outputs.environment }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ needs.determine-environment.outputs.aws-account }}:role/GitHubActionsRole
+          role-session-name: GitHub-Actions-Deploy
+          aws-region: eu-north-1
+
+      - name: Deploy to S3
+        run: |
+          BUCKET_NAME="findash-${{ needs.determine-environment.outputs.environment }}-frontend"
+          aws s3 sync dist/ s3://$BUCKET_NAME --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Comment=='findash-${{ needs.determine-environment.outputs.environment }}-frontend'].Id" \
+            --output text)
+
+          if [ -n "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation \
+              --distribution-id $DISTRIBUTION_ID \
+              --paths "/*"
+            echo "CloudFront cache invalidated for distribution: $DISTRIBUTION_ID"
+          fi
+
+  run-e2e-tests:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: needs.determine-environment.outputs.environment != 'production'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npm ci
+          npm run test:e2e
+        env:
+          BASE_URL: ${{ secrets.FRONTEND_URL }}
+          API_URL: ${{ secrets.API_ENDPOINT }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: frontend/test-results/
+
+  notify-deployment:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [determine-environment, deploy-backend, deploy-frontend]
+    if: always()
+
+    steps:
+      - name: Send Slack notification
+        if: vars.SLACK_WEBHOOK_URL
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "Deployment to ${{ needs.determine-environment.outputs.environment }} ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment Status*\n• Environment: `${{ needs.determine-environment.outputs.environment }}`\n• Branch: `${{ github.ref_name }}`\n• Commit: `${{ github.sha }}`\n• Status: ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
