@@ -1137,7 +1137,7 @@ body {
 }
 
 .transaction-header {
-  @apply bg-gray-50 border-b border-gray-200 px-6 py-3;
+  @apply bg-white border-b border-gray-200 px-6 py-3;
 }
 
 .dark .transaction-header {
