@@ -20,6 +20,7 @@ jobs:
   validate:
     name: Validate Infrastructure
     runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
     defaults:
       run:
         working-directory: infrastructure
@@ -57,6 +58,7 @@ jobs:
   cdk-synth:
     name: CDK Synthesis
     runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
     defaults:
       run:
         working-directory: infrastructure
@@ -102,6 +104,7 @@ jobs:
   security-scan:
     name: Infrastructure Security Scan
     runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
     defaults:
       run:
         working-directory: infrastructure
@@ -150,6 +153,7 @@ jobs:
   cost-analysis:
     name: Cost Analysis
     runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
     defaults:
       run:
         working-directory: infrastructure
@@ -201,6 +205,7 @@ jobs:
   compliance-validation:
     name: Compliance Validation
     runs-on: ubuntu-latest
+    if: hashFiles('infrastructure/package.json') != ''
     defaults:
       run:
         working-directory: infrastructure
