@@ -147,13 +147,14 @@ export const getStandardBASAccounts = (): Partial<AccountCreateRequest>[] => {
 
     // Class 3 - Equity (Eget kapital)
     { accountNumber: '3000', name: 'Eget kapital', nameEnglish: 'Equity', basClass: BASClass.EQUITY },
+    { accountNumber: '3010', name: 'Balanserat resultat', nameEnglish: 'Retained Earnings', basClass: BASClass.EQUITY },
 
     // Class 4 - Revenue (Intäkter)
-    { accountNumber: '3010', name: 'Försäljning varor', nameEnglish: 'Sales of Goods', basClass: BASClass.REVENUE },
-    { accountNumber: '3040', name: 'Försäljning tjänster', nameEnglish: 'Sales of Services', basClass: BASClass.REVENUE },
+    { accountNumber: '4010', name: 'Försäljning varor', nameEnglish: 'Sales of Goods', basClass: BASClass.REVENUE },
+    { accountNumber: '4040', name: 'Försäljning tjänster', nameEnglish: 'Sales of Services', basClass: BASClass.REVENUE },
 
     // Class 5 - Cost of Sales (Kostnad för sålda varor)
-    { accountNumber: '4010', name: 'Inköp varor', nameEnglish: 'Purchase of Goods', basClass: BASClass.COST_OF_SALES },
+    { accountNumber: '5010', name: 'Inköp varor', nameEnglish: 'Purchase of Goods', basClass: BASClass.COST_OF_SALES },
 
     // Class 6 - Operating Expenses (Rörelsekostnader)
     { accountNumber: '5010', name: 'Lokalkostnader', nameEnglish: 'Premises Costs', basClass: BASClass.OPERATING_EXPENSES },
