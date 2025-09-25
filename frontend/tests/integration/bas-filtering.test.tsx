@@ -1,13 +1,27 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { User, UserRole } from '@/types/user-types'
+
+// Mock user for testing
+const mockUser: User = {
+  id: 'test-user-id',
+  username: 'testuser',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  role: UserRole.ACCOUNTANT,
+  isActive: true,
+  createdAt: new Date().toISOString()
+}
 
 describe('Integration: Swedish BAS Filtering', () => {
   it('should filter transactions by BAS class', async () => {
     const user = userEvent.setup()
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
@@ -32,7 +46,8 @@ describe('Integration: Swedish BAS Filtering', () => {
 
   it('should display BAS classes in Swedish with English translations', async () => {
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()

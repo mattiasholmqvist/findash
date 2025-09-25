@@ -1,5 +1,18 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { User, UserRole } from '@/types/user-types'
+
+// Mock user for testing
+const mockUser: User = {
+  id: 'test-user-id',
+  username: 'testuser',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  role: UserRole.ACCOUNTANT,
+  isActive: true,
+  createdAt: new Date().toISOString()
+}
 
 // Mock viewport dimensions
 const mockViewport = (width: number, height: number): void => {
@@ -21,7 +34,8 @@ describe('Integration: Responsive Design Layouts', () => {
     mockViewport(1920, 1080)
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    const { container } = render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    const { container } = render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     // Desktop should show all columns
     expect(screen.getByText('Datum')).toBeInTheDocument()
@@ -39,7 +53,8 @@ describe('Integration: Responsive Design Layouts', () => {
     mockViewport(768, 1024)
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    const { container } = render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    const { container } = render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     // Tablet should show core columns but may condense some
     expect(screen.getByText('Datum')).toBeInTheDocument()
@@ -53,7 +68,8 @@ describe('Integration: Responsive Design Layouts', () => {
     mockViewport(375, 667)
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    const { container } = render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    const { container } = render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     // Mobile should prioritize essential information
     expect(screen.getByText('Datum')).toBeInTheDocument()

@@ -1,13 +1,27 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { User, UserRole } from '@/types/user-types'
+
+// Mock user for testing
+const mockUser: User = {
+  id: 'test-user-id',
+  username: 'testuser',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  role: UserRole.ACCOUNTANT,
+  isActive: true,
+  createdAt: new Date().toISOString()
+}
 
 describe('Integration: Infinite Scroll Pagination', () => {
   it('should load more transactions when scrolling to bottom', async () => {
     const user = userEvent.setup()
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    const { container } = render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    const { container } = render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     // Wait for initial load
     await waitFor(() => {
@@ -36,7 +50,8 @@ describe('Integration: Infinite Scroll Pagination', () => {
 
   it('should maintain performance under 300ms for scroll-triggered loads', async () => {
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    const { container } = render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    const { container } = render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
@@ -65,11 +80,12 @@ describe('Integration: Infinite Scroll Pagination', () => {
 
   it('should handle large datasets efficiently with virtualization', async () => {
     // Configure large dataset
-    const mockConfigService = await import('@/services/mock-config-service')
+    const { mockConfigService } = await import('@/services/mock-config-service')
     await mockConfigService.updateMockConfig({ datasetSize: 2000 })
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()

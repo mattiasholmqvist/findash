@@ -1,11 +1,25 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import { User, UserRole } from '@/types/user-types'
+
+// Mock user for testing
+const mockUser: User = {
+  id: 'test-user-id',
+  username: 'testuser',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  role: UserRole.ACCOUNTANT,
+  isActive: true,
+  createdAt: new Date().toISOString()
+}
 
 describe('Integration: Transaction List Loading', () => {
   it('should load and display transaction list with Swedish formatting', async () => {
     // This test will fail until components are implemented
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     // Should display loading state initially
     expect(screen.getByText(/laddar|loading/i)).toBeInTheDocument()
@@ -29,7 +43,8 @@ describe('Integration: Transaction List Loading', () => {
 
   it('should format Swedish currency correctly', async () => {
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
@@ -48,7 +63,8 @@ describe('Integration: Transaction List Loading', () => {
 
   it('should format dates in Swedish format (YYYY-MM-DD)', async () => {
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
@@ -67,7 +83,8 @@ describe('Integration: Transaction List Loading', () => {
 
   it('should display BAS class categories in Swedish', async () => {
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
@@ -98,11 +115,12 @@ describe('Integration: Transaction List Loading', () => {
 
   it('should handle empty state gracefully', async () => {
     // Mock empty data
-    const mockConfigService = await import('@/services/mock-config-service')
+    const { mockConfigService } = await import('@/services/mock-config-service')
     await mockConfigService.updateMockConfig({ datasetSize: 0 })
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.getByText('Inga transaktioner att visa')).toBeInTheDocument()
@@ -113,7 +131,8 @@ describe('Integration: Transaction List Loading', () => {
     const startTime = performance.now()
 
     const TransactionViewerPage = await import('@/pages/transaction-viewer-page')
-    render(<TransactionViewerPage.default />)
+    const mockOnLogout = vi.fn()
+    render(<TransactionViewerPage.default user={mockUser} onLogout={mockOnLogout} />)
 
     await waitFor(() => {
       expect(screen.queryByText(/laddar|loading/i)).not.toBeInTheDocument()
