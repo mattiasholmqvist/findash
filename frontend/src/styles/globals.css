@@ -862,11 +862,7 @@ body {
 }
 
 .page-transactions {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4;
-}
-
-.dark .page-transactions {
-  @apply bg-slate-800 border-slate-700;
+  @apply space-y-4;
 }
 
 .transaction-list-card {
