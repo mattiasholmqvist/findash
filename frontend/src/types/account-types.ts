@@ -114,8 +114,12 @@ export const buildAccountHierarchy = (accounts: Account[]): AccountHierarchy[] =
     if (account.parentAccountId) {
       const parent = accountMap.get(account.parentAccountId)
       if (parent) {
-        hierarchyAccount.level = parent.level + 1
-        parent.children.push(hierarchyAccount)
+        const updatedAccount = {
+          ...hierarchyAccount,
+          level: parent.level + 1
+        }
+        accountMap.set(account.id, updatedAccount)
+        parent.children.push(updatedAccount)
       } else {
         // Parent not found, treat as root
         rootAccounts.push(hierarchyAccount)
