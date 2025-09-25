@@ -7,15 +7,16 @@ describe('Contract: POST /auth/login', () => {
       password: 'demo123'
     }
 
-    // This test will fail until mock auth service is implemented
-    const mockAuthService = await import('@/services/mock-auth-service')
+    const { mockAuthService } = await import('@/services/mock-auth-service')
     const response = await mockAuthService.login(loginRequest)
 
     expect(response).toBeDefined()
-    expect(response.token).toBeTypeOf('string')
-    expect(response.user).toBeDefined()
-    expect(response.user.username).toBe(loginRequest.username)
-    expect(response.expiresIn).toBeTypeOf('number')
+    expect(response.success).toBe(true)
+    expect(response.data).toBeDefined()
+    expect(response.data?.token).toBeTypeOf('string')
+    expect(response.data?.user).toBeDefined()
+    expect(response.data?.user.username).toBe(loginRequest.username)
+    expect(response.data?.expiresIn).toBeTypeOf('number')
   })
 
   it('should reject invalid credentials with 401 error', async () => {
@@ -24,9 +25,12 @@ describe('Contract: POST /auth/login', () => {
       password: 'wrongpass'
     }
 
-    const mockAuthService = await import('@/services/mock-auth-service')
+    const { mockAuthService } = await import('@/services/mock-auth-service')
+    const response = await mockAuthService.login(invalidRequest)
 
-    await expect(mockAuthService.login(invalidRequest)).rejects.toThrow('Invalid credentials')
+    expect(response.success).toBe(false)
+    expect(response.error).toBeDefined()
+    expect(response.error?.message).toContain('Felaktigt användarnamn eller lösenord')
   })
 
   it('should validate request format and reject malformed requests', async () => {
@@ -35,8 +39,11 @@ describe('Contract: POST /auth/login', () => {
       password: '12' // Invalid: too short password
     }
 
-    const mockAuthService = await import('@/services/mock-auth-service')
+    const { mockAuthService } = await import('@/services/mock-auth-service')
+    const response = await mockAuthService.login(malformedRequest)
 
-    await expect(mockAuthService.login(malformedRequest)).rejects.toThrow('Invalid request format')
+    expect(response.success).toBe(false)
+    expect(response.error).toBeDefined()
+    expect(response.error?.message).toContain('Användarnamn krävs')
   })
 })
