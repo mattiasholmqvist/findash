@@ -1256,3 +1256,193 @@ body {
 .dark .summary-stat-value--negative {
   @apply text-red-400;
 }
+
+/* Transaction Filter Component Styles */
+.transaction-filter {
+  @apply space-y-4;
+}
+
+.filter-header {
+  @apply flex items-center justify-between;
+}
+
+.filter-toggle {
+  @apply flex items-center space-x-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors border-none text-left w-auto;
+}
+
+.dark .filter-toggle {
+  @apply bg-slate-800 hover:bg-slate-700;
+}
+
+.filter-toggle--expanded {
+  @apply bg-blue-50 text-blue-700;
+}
+
+.dark .filter-toggle--expanded {
+  @apply bg-blue-900/20 text-blue-400;
+}
+
+.filter-icon {
+  @apply w-5 h-5 text-gray-600 flex-shrink-0;
+}
+
+.dark .filter-icon {
+  @apply text-gray-400;
+}
+
+.filter-toggle--expanded .filter-icon {
+  @apply text-blue-600;
+}
+
+.dark .filter-toggle--expanded .filter-icon {
+  @apply text-blue-400;
+}
+
+.filter-label-text {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.dark .filter-label-text {
+  @apply text-gray-300;
+}
+
+.filter-toggle--expanded .filter-label-text {
+  @apply text-blue-700;
+}
+
+.dark .filter-toggle--expanded .filter-label-text {
+  @apply text-blue-400;
+}
+
+.filter-toggle-arrow {
+  @apply w-4 h-4 text-gray-400 transition-transform duration-200 ml-auto;
+}
+
+.filter-toggle--expanded .filter-toggle-arrow {
+  @apply transform rotate-180 text-blue-600;
+}
+
+.dark .filter-toggle--expanded .filter-toggle-arrow {
+  @apply text-blue-400;
+}
+
+.reset-filters {
+  @apply px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors border-none cursor-pointer;
+}
+
+.dark .reset-filters {
+  @apply text-red-400 hover:text-red-300 bg-red-900/20 hover:bg-red-900/30;
+}
+
+.filter-panel {
+  @apply transition-all duration-300 ease-in-out overflow-hidden;
+}
+
+.filter-panel:not(.filter-panel--expanded) {
+  @apply max-h-0 opacity-0;
+}
+
+.filter-panel--expanded {
+  @apply max-h-screen opacity-100 mt-4;
+}
+
+.filter-section {
+  @apply space-y-4 py-4 border-b border-gray-200 last:border-b-0;
+}
+
+.dark .filter-section {
+  @apply border-slate-700;
+}
+
+.filter-section-title {
+  @apply text-sm font-medium text-gray-900 mb-3;
+}
+
+.dark .filter-section-title {
+  @apply text-white;
+}
+
+.filter-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.filter-grid--two-cols {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.apply-filters {
+  @apply w-full md:w-auto px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 border-none cursor-pointer;
+}
+
+.dark .apply-filters {
+  @apply bg-blue-700 hover:bg-blue-600 focus:ring-blue-400;
+}
+
+.apply-filters--disabled {
+  @apply opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400;
+}
+
+.dark .apply-filters--disabled {
+  @apply bg-gray-600 hover:bg-gray-600;
+}
+
+.loading-spinner {
+  @apply w-4 h-4 animate-spin;
+}
+
+.error-text {
+  @apply text-xs text-red-600 mt-1;
+}
+
+.dark .error-text {
+  @apply text-red-400;
+}
+
+.filter-input--error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.dark .filter-input--error {
+  @apply border-red-600 focus:ring-red-400 focus:border-red-400;
+}
+
+.filter-select--error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.dark .filter-select--error {
+  @apply border-red-600 focus:ring-red-400 focus:border-red-400;
+}
+
+/* Additional Filter Toggle Elements */
+.expand-icon {
+  @apply w-4 h-4 text-gray-400 transition-transform duration-200 ml-auto;
+}
+
+.dark .expand-icon {
+  @apply text-gray-500;
+}
+
+.filter-toggle--expanded .expand-icon {
+  @apply transform rotate-180 text-blue-600;
+}
+
+.dark .filter-toggle--expanded .expand-icon {
+  @apply text-blue-400;
+}
+
+.active-filter-count {
+  @apply text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full ml-2;
+}
+
+.dark .active-filter-count {
+  @apply text-blue-400 bg-blue-900/30;
+}
+
+.filter-toggle--expanded .active-filter-count {
+  @apply text-blue-700 bg-blue-200;
+}
+
+.dark .filter-toggle--expanded .active-filter-count {
+  @apply text-blue-300 bg-blue-800/40;
+}
