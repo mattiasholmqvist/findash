@@ -1176,6 +1176,10 @@ body {
   @apply text-sm text-gray-900 flex items-center leading-relaxed;
 }
 
+.transaction-cell.col-span-2 {
+  grid-column: span 2;
+}
+
 .dark .transaction-cell {
   @apply text-white;
 }
@@ -1184,8 +1188,100 @@ body {
   @apply font-mono text-xs;
 }
 
+.transaction-cell--description {
+  @apply flex flex-col;
+}
+
+.transaction-description-primary {
+  @apply font-medium text-gray-900 leading-tight;
+}
+
+.dark .transaction-description-primary {
+  @apply text-white;
+}
+
+.transaction-reference {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .transaction-reference {
+  @apply text-gray-400;
+}
+
+.transaction-cell--account {
+  @apply flex flex-col;
+}
+
+.account-number {
+  @apply font-mono text-xs text-gray-500 font-medium;
+}
+
+.dark .account-number {
+  @apply text-gray-400;
+}
+
+.account-name {
+  @apply text-sm text-gray-900 mt-1;
+}
+
+.dark .account-name {
+  @apply text-white;
+}
+
+.transaction-cell--bas {
+  @apply flex flex-col;
+}
+
+.bas-class-number {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.dark .bas-class-number {
+  @apply text-gray-400;
+}
+
+.bas-class-name {
+  @apply text-sm text-gray-900 mt-1;
+}
+
+.dark .bas-class-name {
+  @apply text-white;
+}
+
+.transaction-cell--vat {
+  @apply flex flex-col;
+}
+
+.transaction-vat {
+  @apply flex flex-col;
+}
+
+.vat-amount {
+  @apply font-mono text-xs font-medium;
+}
+
+.vat-rate {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .vat-rate {
+  @apply text-gray-400;
+}
+
 .transaction-cell--amount {
-  @apply font-mono text-right font-medium;
+  @apply flex flex-col items-end font-mono;
+}
+
+.amount-value {
+  @apply font-medium text-base;
+}
+
+.amount-type {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.dark .amount-type {
+  @apply text-gray-400;
 }
 
 .transaction-cell--debit {

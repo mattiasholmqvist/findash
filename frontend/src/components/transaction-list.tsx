@@ -75,66 +75,70 @@ const TransactionRow = ({ index, style, data }: TransactionRowProps) => {
       role={onTransactionSelect ? 'button' : undefined}
       aria-label={onTransactionSelect ? `Välj transaktion ${transaction.description}` : undefined}
     >
-      <div className="transaction-content">
-        <div className="transaction-main">
-          <div className="transaction-date">
-            {formatSwedishDate(transaction.date)}
-          </div>
-
-          <div className="transaction-description">
-            <div className="transaction-description-primary">
-              {transaction.description}
-            </div>
-            {transaction.reference && (
-              <div className="transaction-reference">
-                Ref: {transaction.reference}
-              </div>
-            )}
-          </div>
-
-          <div className={`transaction-amount ${isDebit ? 'transaction-amount--debit' : 'transaction-amount--credit'}`}>
-            <span className="amount-value">
-              {formatSwedishCurrency(transaction.amount)}
-            </span>
-            <span className="amount-type">
-              {isDebit ? 'Debet' : 'Kredit'}
-            </span>
-          </div>
-        </div>
-
-        <div className="transaction-details">
-          <div className="transaction-account">
-            <span className="account-number">
-              {transaction.accountNumber}
-            </span>
-            <span className="account-name">
-              {transaction.account.name}
-            </span>
-          </div>
-
-          <div className="transaction-bas-class">
-            <span className="bas-class-number">
-              Klass {transaction.basClass}
-            </span>
-            <span className="bas-class-name">
-              {getBASClassName(transaction.basClass)}
-            </span>
-          </div>
-
-          {transaction.vatAmount && transaction.vatRate && (
-            <div className="transaction-vat">
-              <span className="vat-label">Moms:</span>
-              <span className="vat-amount">
-                {formatSwedishCurrency(transaction.vatAmount)}
-              </span>
-              <span className="vat-rate">
-                ({transaction.vatRate}%)
-              </span>
-            </div>
-          )}
-        </div>
+      {/* Date column */}
+      <div className="transaction-cell transaction-cell--date">
+        {formatSwedishDate(transaction.date)}
       </div>
 
+      {/* Description column (2 columns wide) */}
+      <div className="transaction-cell transaction-cell--description col-span-2">
+        <div className="transaction-description-primary">
+          {transaction.description}
+        </div>
+        {transaction.reference && (
+          <div className="transaction-reference">
+            Ref: {transaction.reference}
+          </div>
+        )}
+      </div>
+
+      {/* Account column (2 columns wide) */}
+      <div className="transaction-cell transaction-cell--account col-span-2">
+        <span className="account-number">
+          {transaction.accountNumber}
+        </span>
+        <span className="account-name">
+          {transaction.account.name}
+        </span>
+      </div>
+
+      {/* BAS Class column (2 columns wide) */}
+      <div className="transaction-cell transaction-cell--bas col-span-2">
+        <span className="bas-class-number">
+          Klass {transaction.basClass}
+        </span>
+        <span className="bas-class-name">
+          {getBASClassName(transaction.basClass)}
+        </span>
+      </div>
+
+      {/* VAT column */}
+      <div className="transaction-cell transaction-cell--vat">
+        {transaction.vatAmount && transaction.vatRate ? (
+          <div className="transaction-vat">
+            <span className="vat-amount">
+              {formatSwedishCurrency(transaction.vatAmount)}
+            </span>
+            <span className="vat-rate">
+              ({transaction.vatRate}%)
+            </span>
+          </div>
+        ) : (
+          <span className="text-gray-400">-</span>
+        )}
+      </div>
+
+      {/* Amount column (2 columns wide) */}
+      <div className={`transaction-cell transaction-cell--amount col-span-2 ${isDebit ? 'transaction-cell--debit' : 'transaction-cell--credit'}`}>
+        <span className="amount-value">
+          {formatSwedishCurrency(transaction.amount)}
+        </span>
+        <span className="amount-type">
+          {isDebit ? 'Debet' : 'Kredit'}
+        </span>
+      </div>
+
+      {/* Selection indicator */}
       {isSelected && (
         <div className="transaction-selection-indicator" aria-hidden="true">
           <svg viewBox="0 0 20 20" fill="currentColor">
@@ -263,6 +267,18 @@ export const TransactionList = ({
       </div>
 
       <div className="transaction-list-content">
+        {/* Transaction header */}
+        <div className="transaction-header">
+          <div className="transaction-header-row">
+            <div className="transaction-cell transaction-cell--date">Datum</div>
+            <div className="transaction-cell col-span-2">Beskrivning</div>
+            <div className="transaction-cell col-span-2">Konto</div>
+            <div className="transaction-cell col-span-2">BAS-klass</div>
+            <div className="transaction-cell">Moms</div>
+            <div className="transaction-cell col-span-2">Belopp</div>
+          </div>
+        </div>
+
         <InfiniteLoader
           isItemLoaded={isItemLoaded}
           itemCount={itemCount}
@@ -275,7 +291,7 @@ export const TransactionList = ({
                 setListRef(list)
                 ref(list)
               }}
-              height={height}
+              height={height - 60} // Subtract header height
               itemCount={itemCount}
               itemSize={120} // Height of each transaction row
               itemData={itemData}
